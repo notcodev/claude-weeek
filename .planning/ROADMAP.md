@@ -12,7 +12,7 @@ Four phases take the project from zero to a published npm package. Phase 1 estab
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation** - Server boots, auth validated, API client ready, logging and error handling established
+- [x] **Phase 1: Foundation** - Server boots, auth validated, API client ready, logging and error handling established (completed 2026-04-09)
 - [ ] **Phase 2: Read Tools** - All navigation and read tools working — agents can fetch projects, boards, tasks, and comments
 - [ ] **Phase 3: Write Tools** - All mutation tools working — agents can create, update, move, complete tasks and post comments
 - [ ] **Phase 4: Distribution & Quality** - npm package published, README complete, tests in place
@@ -78,7 +78,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 2/3 | In Progress|  |
+| 1. Foundation | 3/3 | Complete   | 2026-04-09 |
 | 2. Read Tools | 0/? | Not started | - |
 | 3. Write Tools | 0/? | Not started | - |
 | 4. Distribution & Quality | 0/? | Not started | - |
