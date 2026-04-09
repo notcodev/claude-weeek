@@ -2,25 +2,26 @@
  * Write tool group for WEEEK MCP server.
  *
  * INFRA-06: Write tools live in this group separate from read tools so MCP
- * clients can require user confirmation for mutations while auto-approving reads.
+ * clients (Claude Desktop, Cursor) can require user confirmation for mutations
+ * while auto-approving reads.
  *
- * Phase 1: This function is intentionally empty. Phase 3 will add mutation
- * tools here (weeek_create_task, weeek_update_task, etc.).
+ * Phase 3 in progress:
+ *   Plan 03-01 (this file): create_task, update_task
+ *   Plan 03-02 (next):      move_task, complete_task, create_task_comment
  */
-
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { WeeekApiClient } from "../../client/weeek-api-client.js";
 import { logger } from "../../logger.js";
+import { registerCreateTask } from "./create-task.js";
+import { registerUpdateTask } from "./update-task.js";
 
 export function registerWriteTools(
-  _server: McpServer,
-  _client: WeeekApiClient
+  server: McpServer,
+  client: WeeekApiClient
 ): void {
-  // Phase 1: no write tools yet. Phase 3 adds:
-  //   - weeek_create_task
-  //   - weeek_update_task
-  //   - weeek_move_task
-  //   - weeek_complete_task
-  //   - weeek_create_task_comment
-  logger.info("registerWriteTools: 0 write tools registered (Phase 1 skeleton)");
+  // Task authoring (Plan 03-01)
+  registerCreateTask(server, client);
+  registerUpdateTask(server, client);
+
+  logger.info("registerWriteTools: 2 write tools registered (Phase 3 Plan 01)");
 }
