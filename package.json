@@ -7,7 +7,31 @@
     "weeek-mcp-server": "./dist/index.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "author": "Makar Glavanar",
+  "license": "MIT",
+  "homepage": "https://github.com/makarglavanar/weeek-mcp#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/makarglavanar/weeek-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/makarglavanar/weeek-mcp/issues"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "weeek",
+    "task-manager",
+    "task-tracker",
+    "ai-agents",
+    "claude",
+    "cursor",
+    "llm-tools"
   ],
   "scripts": {
     "build": "tsc",
