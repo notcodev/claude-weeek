@@ -24,9 +24,9 @@
 
 ### Tasks — Read
 
-- [ ] **TASK-01**: Тул `weeek_list_tasks` — список задач с фильтрацией (по проекту/доске/статусу/исполнителю)
-- [ ] **TASK-02**: Тул `weeek_get_task` — детальная информация о задаче по ID
-- [ ] **TASK-03**: Пагинация задач с дефолтным лимитом (защита от превышения 25K токенов в ответе)
+- [x] **TASK-01**: Тул `weeek_list_tasks` — список задач с фильтрацией (по проекту/доске/статусу/исполнителю)
+- [x] **TASK-02**: Тул `weeek_get_task` — детальная информация о задаче по ID
+- [x] **TASK-03**: Пагинация задач с дефолтным лимитом (защита от превышения 25K токенов в ответе)
 
 ### Tasks — Write
 
@@ -37,7 +37,7 @@
 
 ### Comments
 
-- [ ] **CMNT-01**: Тул `weeek_list_task_comments` — список комментариев к задаче
+- [x] **CMNT-01**: Тул `weeek_list_task_comments` — список комментариев к задаче
 - [ ] **CMNT-02**: Тул `weeek_create_task_comment` — создание комментария к задаче
 
 ### Distribution
@@ -103,14 +103,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | NAV-02 | Phase 2 | Complete |
 | NAV-03 | Phase 2 | Complete |
 | NAV-04 | Phase 2 | Complete |
-| TASK-01 | Phase 2 | Pending |
-| TASK-02 | Phase 2 | Pending |
-| TASK-03 | Phase 2 | Pending |
+| TASK-01 | Phase 2 | Complete |
+| TASK-02 | Phase 2 | Complete |
+| TASK-03 | Phase 2 | Complete |
 | TASK-04 | Phase 3 | Pending |
 | TASK-05 | Phase 3 | Pending |
 | TASK-06 | Phase 3 | Pending |
 | TASK-07 | Phase 3 | Pending |
-| CMNT-01 | Phase 2 | Pending |
+| CMNT-01 | Phase 2 | Complete |
 | CMNT-02 | Phase 3 | Pending |
 | DIST-01 | Phase 4 | Pending |
 | DIST-02 | Phase 4 | Pending |

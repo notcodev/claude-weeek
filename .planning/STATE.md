@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Completed 02-01-PLAN.md (Navigation read tools + shared helpers)
-last_updated: "2026-04-09T13:42:23.166Z"
+stopped_at: Completed 02-02-PLAN.md (Task + comment read tools — Phase 2 complete)
+last_updated: "2026-04-09T13:46:19.904Z"
 last_activity: 2026-04-09
 progress:
   total_phases: 4
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 5
-  completed_plans: 4
+  completed_plans: 5
   percent: 0
 ---
 
@@ -56,6 +56,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01-foundation P02 | 3 | 3 tasks | 5 files |
 | Phase 01-foundation P03 | 5 | 3 tasks | 4 files |
 | Phase 02-read-tools P01 | 12 | 3 tasks | 6 files |
+| Phase 02-read-tools P02 | 2 | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -81,6 +82,8 @@ Recent decisions affecting current work:
 - [Phase 02-read-tools]: server.registerTool(name, {description, inputSchema}, cb) used — non-deprecated MCP SDK v1.29 API (server.tool() is marked @deprecated in d.ts)
 - [Phase 02-read-tools]: inputSchema is ZodRawShapeCompat (plain object of Zod schemas), NOT z.object() — MCP SDK v1.29 convention
 - [Phase 02-read-tools]: extractArray falls back to first array in response if named key absent — defensive against undocumented WEEEK API shape
+- [Phase 02-read-tools]: Comments endpoint /tm/tasks/{id}/comments treated as primary (unverified); 404 fallback to embedded task.comments implemented
+- [Phase 02-read-tools]: get-task strips embedded comments array before returning — keeps response small, separates concerns
 
 ### Pending Todos
 
@@ -92,6 +95,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-09T13:42:23.163Z
-Stopped at: Completed 02-01-PLAN.md (Navigation read tools + shared helpers)
+Last session: 2026-04-09T13:46:19.902Z
+Stopped at: Completed 02-02-PLAN.md (Task + comment read tools — Phase 2 complete)
 Resume file: None
