@@ -60,7 +60,10 @@ Plans:
   3. Agent can move a task to a different board column — status change is reflected when task is fetched afterwards
   4. Agent can mark a task complete or reopen a completed task
   5. Agent can post a comment on a task — the created comment is returned in the response
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 03-write-tools/03-01-PLAN.md — Task authoring (create_task, update_task)
+- [ ] 03-write-tools/03-02-PLAN.md — Task lifecycle + comments (move_task, complete_task, create_task_comment)
 
 ### Phase 4: Distribution & Quality
 **Goal**: The server is published to npm, installable via `npx weeek-mcp-server`, documented with working config examples, and covered by tests
