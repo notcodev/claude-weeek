@@ -1,0 +1,14 @@
+src/
+test/
+tests/
+.planning/
+.github/
+.vscode/
+.idea/
+*.test.ts
+*.spec.ts
+tsconfig.json
+.eslintrc.json
+.gitignore
+CLAUDE.md
+vitest.config.ts
