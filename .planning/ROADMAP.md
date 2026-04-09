@@ -75,7 +75,11 @@ Plans:
   3. Every tool has a description that answers "when to use this vs. similar tools" — validated by asking an agent to select the right tool for common scenarios
   4. All tool input parameters are validated by Zod schemas — invalid inputs return descriptive errors, not crashes
   5. Integration or mocked tests cover the happy path and error path for at least the core task read/write tools
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 04-distribution-quality/04-01-PLAN.md — Documentation (README with Claude Desktop/Cursor configs + NVM workaround, CHANGELOG, package.json metadata, .npmignore review)
+- [ ] 04-distribution-quality/04-02-PLAN.md — Tests (vitest config, unit tests for config/errors/WeeekApiClient, mocked tool tests for list_projects + create_task)
+- [ ] 04-distribution-quality/04-03-PLAN.md — Quality polish (tool description audit per Pitfall 4, Zod schema audit, end-to-end npm pack + clean npx smoke test)
 
 ## Progress
 
@@ -87,4 +91,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | 1. Foundation | 3/3 | Complete   | 2026-04-09 |
 | 2. Read Tools | 1/2 | In Progress|  |
 | 3. Write Tools | 2/2 | Complete   | 2026-04-09 |
-| 4. Distribution & Quality | 0/? | Not started | - |
+| 4. Distribution & Quality | 1/3 | In Progress|  |

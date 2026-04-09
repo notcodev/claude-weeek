@@ -42,11 +42,11 @@
 
 ### Distribution
 
-- [ ] **DIST-01**: npm-пакет `weeek-mcp-server` с `bin` полем для CLI
-- [ ] **DIST-02**: Запуск через `npx weeek-mcp-server` без предварительной установки
-- [ ] **DIST-03**: TypeScript компилируется в ESM (NodeNext), shebang в entry point
-- [ ] **DIST-04**: README с примерами конфигов для Claude Desktop, Cursor, и других MCP клиентов
-- [ ] **DIST-05**: README содержит workaround для NVM + npx проблемы (GUI клиенты не видят PATH)
+- [x] **DIST-01**: npm-пакет `weeek-mcp-server` с `bin` полем для CLI
+- [x] **DIST-02**: Запуск через `npx weeek-mcp-server` без предварительной установки
+- [x] **DIST-03**: TypeScript компилируется в ESM (NodeNext), shebang в entry point
+- [x] **DIST-04**: README с примерами конфигов для Claude Desktop, Cursor, и других MCP клиентов
+- [x] **DIST-05**: README содержит workaround для NVM + npx проблемы (GUI клиенты не видят PATH)
 
 ### Quality
 
@@ -112,11 +112,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TASK-07 | Phase 3 | Complete |
 | CMNT-01 | Phase 2 | Complete |
 | CMNT-02 | Phase 3 | Complete |
-| DIST-01 | Phase 4 | Pending |
-| DIST-02 | Phase 4 | Pending |
-| DIST-03 | Phase 4 | Pending |
-| DIST-04 | Phase 4 | Pending |
-| DIST-05 | Phase 4 | Pending |
+| DIST-01 | Phase 4 | Complete |
+| DIST-02 | Phase 4 | Complete |
+| DIST-03 | Phase 4 | Complete |
+| DIST-04 | Phase 4 | Complete |
+| DIST-05 | Phase 4 | Complete |
 | QUAL-01 | Phase 4 | Pending |
 | QUAL-02 | Phase 4 | Pending |
 | QUAL-03 | Phase 4 | Pending |

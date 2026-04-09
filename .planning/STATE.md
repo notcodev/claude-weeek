@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Completed 03-write-tools/03-02-PLAN.md
-last_updated: "2026-04-09T14:05:46.296Z"
+stopped_at: Completed 04-distribution-quality/04-01-PLAN.md
+last_updated: "2026-04-09T14:23:29.701Z"
 last_activity: 2026-04-09
 progress:
   total_phases: 4
   completed_phases: 3
-  total_plans: 7
-  completed_plans: 7
+  total_plans: 10
+  completed_plans: 8
   percent: 0
 ---
 
@@ -59,6 +59,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 02-read-tools P02 | 2 | 3 tasks | 4 files |
 | Phase 03-write-tools P01 | 2 | 3 tasks | 3 files |
 | Phase 03-write-tools P02 | 2min | 3 tasks | 4 files |
+| Phase 04-distribution-quality P04-01 | 2 | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -90,6 +91,8 @@ Recent decisions affecting current work:
 - [Phase 03-write-tools]: jsonContent imported from ../read/_helpers.js (no _shared.ts created yet — per CONTEXT decision)
 - [Phase 03-write-tools]: PUT /tm/tasks/{id} used for move and complete — REST-canonical guess; gap closure will switch if WEEEK has dedicated endpoints
 - [Phase 03-write-tools]: isCompleted field name chosen to match Phase 2 list_tasks filter param naming
+- [Phase 04-distribution-quality]: package.json files[] allow-list is primary publish control; .npmignore added as defense-in-depth
+- [Phase 04-distribution-quality]: NVM workaround given its own H2 section in README (most-reported MCP setup issue per PITFALLS.md)
 
 ### Pending Todos
 
@@ -101,6 +104,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-09T14:05:46.294Z
-Stopped at: Completed 03-write-tools/03-02-PLAN.md
+Last session: 2026-04-09T14:23:29.699Z
+Stopped at: Completed 04-distribution-quality/04-01-PLAN.md
 Resume file: None
