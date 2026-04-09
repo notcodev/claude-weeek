@@ -32,13 +32,13 @@
 
 - [x] **TASK-04**: Тул `weeek_create_task` — создание задачи (название, описание, проект, доска, приоритет, исполнитель)
 - [x] **TASK-05**: Тул `weeek_update_task` — обновление полей задачи (название, описание, приоритет, исполнитель)
-- [ ] **TASK-06**: Тул `weeek_move_task` — перемещение задачи между колонками доски (управление статусом)
-- [ ] **TASK-07**: Тул `weeek_complete_task` — завершение/возобновление задачи
+- [x] **TASK-06**: Тул `weeek_move_task` — перемещение задачи между колонками доски (управление статусом)
+- [x] **TASK-07**: Тул `weeek_complete_task` — завершение/возобновление задачи
 
 ### Comments
 
 - [x] **CMNT-01**: Тул `weeek_list_task_comments` — список комментариев к задаче
-- [ ] **CMNT-02**: Тул `weeek_create_task_comment` — создание комментария к задаче
+- [x] **CMNT-02**: Тул `weeek_create_task_comment` — создание комментария к задаче
 
 ### Distribution
 
@@ -108,10 +108,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TASK-03 | Phase 2 | Complete |
 | TASK-04 | Phase 3 | Complete |
 | TASK-05 | Phase 3 | Complete |
-| TASK-06 | Phase 3 | Pending |
-| TASK-07 | Phase 3 | Pending |
+| TASK-06 | Phase 3 | Complete |
+| TASK-07 | Phase 3 | Complete |
 | CMNT-01 | Phase 2 | Complete |
-| CMNT-02 | Phase 3 | Pending |
+| CMNT-02 | Phase 3 | Complete |
 | DIST-01 | Phase 4 | Pending |
 | DIST-02 | Phase 4 | Pending |
 | DIST-03 | Phase 4 | Pending |

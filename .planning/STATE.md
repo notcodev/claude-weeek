@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Completed 03-01-PLAN.md (weeek_create_task + weeek_update_task — Plan 03-01 done)
-last_updated: "2026-04-09T14:01:59.094Z"
+stopped_at: Completed 03-write-tools/03-02-PLAN.md
+last_updated: "2026-04-09T14:05:46.296Z"
 last_activity: 2026-04-09
 progress:
   total_phases: 4
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 7
-  completed_plans: 6
+  completed_plans: 7
   percent: 0
 ---
 
@@ -58,6 +58,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 02-read-tools P01 | 12 | 3 tasks | 6 files |
 | Phase 02-read-tools P02 | 2 | 3 tasks | 4 files |
 | Phase 03-write-tools P01 | 2 | 3 tasks | 3 files |
+| Phase 03-write-tools P02 | 2min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -87,6 +88,8 @@ Recent decisions affecting current work:
 - [Phase 02-read-tools]: get-task strips embedded comments array before returning — keeps response small, separates concerns
 - [Phase 03-write-tools]: PUT for weeek_update_task — if WEEEK responds 405 on live testing, Plan 03-02 gap closure will switch to client.patch
 - [Phase 03-write-tools]: jsonContent imported from ../read/_helpers.js (no _shared.ts created yet — per CONTEXT decision)
+- [Phase 03-write-tools]: PUT /tm/tasks/{id} used for move and complete — REST-canonical guess; gap closure will switch if WEEEK has dedicated endpoints
+- [Phase 03-write-tools]: isCompleted field name chosen to match Phase 2 list_tasks filter param naming
 
 ### Pending Todos
 
@@ -98,6 +101,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-09T14:01:59.092Z
-Stopped at: Completed 03-01-PLAN.md (weeek_create_task + weeek_update_task — Plan 03-01 done)
+Last session: 2026-04-09T14:05:46.294Z
+Stopped at: Completed 03-write-tools/03-02-PLAN.md
 Resume file: None
