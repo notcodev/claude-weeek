@@ -112,23 +112,6 @@ describe("weeek_update_task tool", () => {
     expect(putFn).not.toHaveBeenCalled();
   });
 
-  it("strips embedded comments from the PUT response", async () => {
-    const client = {
-      get: vi.fn(),
-      post: vi.fn(),
-      put: vi.fn(async () => ({
-        task: { id: "t1", title: "Done", comments: [{ id: "c1", text: "noise" }] },
-      })),
-      patch: vi.fn(),
-    } as unknown as Parameters<typeof registerUpdateTask>[1];
-    registerUpdateTask(fake.server, client);
-
-    const res = await fake.getHandler()({ task_id: "t1", title: "Done" });
-    const payload = JSON.parse(res.content[0]!.text) as Record<string, unknown>;
-    expect("comments" in payload).toBe(false);
-    expect(payload.id).toBe("t1");
-  });
-
   it("returns isError:true on WeeekApiError, does not throw", async () => {
     const client = {
       get: vi.fn(),

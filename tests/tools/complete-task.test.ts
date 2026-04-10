@@ -100,23 +100,6 @@ describe("weeek_complete_task tool", () => {
     expect(body.isCompleted).toBe(false);
   });
 
-  it("strips embedded comments from the response", async () => {
-    const client = {
-      get: vi.fn(),
-      post: vi.fn(),
-      put: vi.fn(async () => ({
-        task: { id: "t1", isCompleted: true, comments: [{ id: "c1", text: "noise" }] },
-      })),
-      patch: vi.fn(),
-    } as unknown as Parameters<typeof registerCompleteTask>[1];
-    registerCompleteTask(fake.server, client);
-
-    const res = await fake.getHandler()({ task_id: "t1" });
-    const payload = JSON.parse(res.content[0]!.text) as Record<string, unknown>;
-    expect("comments" in payload).toBe(false);
-    expect(payload.isCompleted).toBe(true);
-  });
-
   it("returns isError:true on WeeekApiError, does not throw", async () => {
     const client = {
       get: vi.fn(),

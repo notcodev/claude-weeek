@@ -103,22 +103,6 @@ describe("weeek_move_task tool", () => {
     expect(body.boardId).toBe("board-B");
   });
 
-  it("strips embedded comments from the response", async () => {
-    const client = {
-      get: vi.fn(),
-      post: vi.fn(),
-      put: vi.fn(async () => ({
-        task: { id: "t1", boardColumnId: "col-2", comments: [{ id: "c1" }] },
-      })),
-      patch: vi.fn(),
-    } as unknown as Parameters<typeof registerMoveTask>[1];
-    registerMoveTask(fake.server, client);
-
-    const res = await fake.getHandler()({ task_id: "t1", board_column_id: "col-2" });
-    const payload = JSON.parse(res.content[0]!.text) as Record<string, unknown>;
-    expect("comments" in payload).toBe(false);
-  });
-
   it("returns isError:true on WeeekApiError, does not throw", async () => {
     const client = {
       get: vi.fn(),

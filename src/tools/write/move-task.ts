@@ -71,11 +71,6 @@ export function registerMoveTask(
           body
         );
         const task = unwrapTask(raw);
-        if (task && typeof task === "object" && "comments" in (task as object)) {
-          const { comments: _dropped, ...rest } = task as Record<string, unknown>;
-          void _dropped;
-          return jsonContent(rest);
-        }
         return jsonContent(task);
       } catch (err) {
         return toMcpError(err);
