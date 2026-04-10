@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-08)
 Phase: 01 (foundation) — EXECUTING
 Plan: 3 of 3
 Status: Phase complete — ready for verification
-Last activity: 2026-04-09
+Last activity: 2026-04-10 - Completed quick task 260410-jfw: Remove comment tools — WEEEK API has no comment endpoints
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -87,8 +87,7 @@ Recent decisions affecting current work:
 - [Phase 02-read-tools]: server.registerTool(name, {description, inputSchema}, cb) used — non-deprecated MCP SDK v1.29 API (server.tool() is marked @deprecated in d.ts)
 - [Phase 02-read-tools]: inputSchema is ZodRawShapeCompat (plain object of Zod schemas), NOT z.object() — MCP SDK v1.29 convention
 - [Phase 02-read-tools]: extractArray falls back to first array in response if named key absent — defensive against undocumented WEEEK API shape
-- [Phase 02-read-tools]: Comments endpoint /tm/tasks/{id}/comments treated as primary (unverified); 404 fallback to embedded task.comments implemented
-- [Phase 02-read-tools]: get-task strips embedded comments array before returning — keeps response small, separates concerns
+- [Phase 02-read-tools]: Comment tools removed (quick-260410-jfw) — WEEEK Public API has no comment endpoints
 - [Phase 03-write-tools]: PUT for weeek_update_task — if WEEEK responds 405 on live testing, Plan 03-02 gap closure will switch to client.patch
 - [Phase 03-write-tools]: jsonContent imported from ../read/_helpers.js (no _shared.ts created yet — per CONTEXT decision)
 - [Phase 03-write-tools]: PUT /tm/tasks/{id} used for move and complete — REST-canonical guess; gap closure will switch if WEEEK has dedicated endpoints
@@ -107,6 +106,12 @@ None yet.
 ### Blockers/Concerns
 
 None yet.
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260410-jfw | Remove comment tools — WEEEK API has no comment endpoints | 2026-04-10 | 07808ab | [260410-jfw-remove-comment-tools-weeek-api-has-no-co](./quick/260410-jfw-remove-comment-tools-weeek-api-has-no-co/) |
 
 ## Session Continuity
 
