@@ -31,10 +31,22 @@
       "description": "Maps workflow stage names to lists of column-name candidates that match. Skills compare against these case-insensitively. All sub-fields optional. Multi-stage workflows (In Progress → Review → Testing → Done) are first-class — populate review/testing only if your boards use those stages.",
       "additionalProperties": false,
       "properties": {
-        "inProgress": { "type": "array", "items": { "type": "string", "minLength": 1 } },
-        "review":     { "type": "array", "items": { "type": "string", "minLength": 1 } },
-        "testing":    { "type": "array", "items": { "type": "string", "minLength": 1 } },
-        "done":       { "type": "array", "items": { "type": "string", "minLength": 1 } }
+        "inProgress": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "review": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "testing": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "done": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
       }
     }
   }
