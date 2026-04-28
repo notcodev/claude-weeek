@@ -32,7 +32,8 @@
     "CHANGELOG.md",
     "LICENSE",
     "README.md",
-    "dist"
+    "dist",
+    "plugin"
   ],
   "engines": {
     "node": ">=20.0.0"
