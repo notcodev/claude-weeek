@@ -1,0 +1,18 @@
+{
+  "name": "claude-weeek",
+  "displayName": "WEEEK",
+  "version": "1.0.0",
+  "description": "WEEEK task tracker integration for Claude Code — read/write tools for AI coding agents",
+  "author": {
+    "name": "Erik Codev",
+    "email": "hello@notco.dev",
+    "url": "https://github.com/notcodev"
+  },
+  "homepage": "https://github.com/notcodev/claude-weeek#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/notcodev/claude-weeek.git"
+  },
+  "license": "MIT",
+  "keywords": ["mcp", "weeek", "task-tracker", "claude"]
+}

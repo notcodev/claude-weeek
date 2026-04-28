@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "weeek": {
+      "command": "npx",
+      "args": ["-y", "claude-weeek"],
+      "env": {
+        "WEEEK_API_TOKEN": "${WEEEK_API_TOKEN}"
+      }
+    }
+  }
+}
