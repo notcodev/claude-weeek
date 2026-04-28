@@ -2,13 +2,27 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add 6 skills, 2 hooks, and 2 new MCP tools to the `claude-weeek` plugin so Claude Code sessions can pull task context from git, generate standups, advance tasks across multi-stage workflows, and use task comments as a cross-session/cross-repo context bus — universally, without prescribing a single company's process.
+**Goal:** Add 5 skills and 2 hooks to the `claude-weeek` plugin so Claude Code sessions can pull task context from git, generate standups, and advance tasks across multi-stage workflows — universally, without prescribing a single company's process. (The originally planned 6th skill, `weeek-log`, and its two backing MCP tools were dropped after Task 0 confirmed the WEEEK Public API does not expose comment endpoints. See "Task 0 Outcome" below.)
 
 **Architecture:** Skills and hooks are pure orchestration — they read git/local state, apply detection logic from `lib/task-detector.mjs`, and either inject context for the agent (hooks) or instruct the agent to call the right `weeek_*` MCP tools (skills). No HTTP calls or token usage in the plugin layer. Per-repo `.weeek.json` (validated by a JSON Schema shipped in the repo) drives all team-specific behaviour.
 
 **Tech Stack:** Node.js 20 ESM, native `child_process` / `fs` (zero npm deps in `plugin/`), Vitest for tests, existing MCP SDK + Zod v3.25 patterns for the two new tools.
 
 **Spec:** `docs/superpowers/specs/2026-04-28-weeek-skills-and-hooks-design.md` — read before starting if you have not.
+
+---
+
+## Task 0 Outcome (resolved 2026-04-28)
+
+The WEEEK Public API v1 does **not** expose any comment endpoints. Both `GET /public/v1/tm/tasks/{id}/comments` and several other path/query variants return 404. The workspace-scoped path `https://api.weeek.net/ws/{workspaceId}/tm/tasks/{id}/comments` exists in the WEEEK web app, but it is session-cookie authenticated — every Bearer-token auth scheme tested returns 401.
+
+**Decision:** apply the spec's Risk #1 mitigation. The following tasks are SKIPPED in this iteration:
+
+- Task 6 (`weeek_list_comments` MCP tool)
+- Task 7 (`weeek_add_comment` MCP tool)
+- Task 13 (`weeek-log` skill)
+
+Dependent edits already applied below in tasks 3, 8, 11, 12, and 15: every reference to `weeek_list_comments`, `weeek_add_comment`, `/weeek-log`, and the cross-repo "context bus through comments" narrative has been removed. The plan now contains 14 active tasks (0, 1, 2, 3, 4, 5, 8, 9, 10, 11, 12, 14, 15, 16, 17).
 
 ---
 
@@ -21,13 +35,10 @@
 | `plugin/hooks/detect-task-on-session.mjs` | SessionStart hook: branch → task ID → context injection. |
 | `plugin/hooks/detect-task-on-commit.mjs` | PostToolUse hook: `git commit` → task ID → context injection. |
 | `plugin/.claude-plugin/hooks.json` | Registers both hooks with Claude Code. |
-| `plugin/skills/<name>/SKILL.md` × 6 | Markdown skill instructions for the agent. |
-| `src/tools/read/list-comments.ts` | New MCP read tool `weeek_list_comments`. |
-| `src/tools/write/add-comment.ts` | New MCP write tool `weeek_add_comment`. |
+| `plugin/skills/<name>/SKILL.md` × 5 | Markdown skill instructions for the agent (weeek-start, weeek-today, weeek-standup, weeek-advance, weeek-context). |
 | `tests/lib/task-detector.test.ts` | Unit tests for the detector. |
 | `tests/hooks/detect-task-on-session.test.ts` | Spawn-based tests for the SessionStart hook. |
 | `tests/hooks/detect-task-on-commit.test.ts` | Spawn-based tests for the PostToolUse hook. |
-| `tests/tools/list-comments.test.ts` + `add-comment.test.ts` | Unit tests following the pattern in `tests/tools/get-task.test.ts`. |
 | `package.json` | Update `"files"` to include `plugin`. |
 | `README.md` | New "Configuration" section. |
 | `CLAUDE.md` | One-paragraph pointer that the plugin now ships skills + hooks. |
@@ -477,13 +488,10 @@ try {
   const id = detectTaskId(branch, patterns)
   if (id === null) process.exit(0)
 
-  // NOTE: if Task 0 dropped the comment tools, remove the
-  // `weeek_list_comments` mention from this string.
   const message =
     `Repo branch "${branch}" references WEEEK task ${id}. ` +
     `If the user asks about this work, consider calling ` +
-    `weeek_get_task({ task_id: "${id}" }) and ` +
-    `weeek_list_comments({ task_id: "${id}" }) for cross-session context. ` +
+    `weeek_get_task({ task_id: "${id}" }) for context. ` +
     `Do not announce this proactively unless asked.`
 
   emitContext('SessionStart', message)
@@ -748,9 +756,9 @@ git commit -m "feat(plugin): register SessionStart and PostToolUse hooks"
 
 ---
 
-## Task 6: `weeek_list_comments` MCP tool
+## Task 6: `weeek_list_comments` MCP tool — **SKIPPED**
 
-**SKIP THIS TASK** if Task 0 found that the WEEEK API does not expose a comments endpoint.
+**SKIPPED.** Task 0 confirmed the WEEEK Public API does not expose comment endpoints. Do not implement.
 
 **Files:**
 - Create: `src/tools/read/list-comments.ts`
@@ -967,9 +975,9 @@ git commit -m "feat(tools): add weeek_list_comments MCP read tool"
 
 ---
 
-## Task 7: `weeek_add_comment` MCP tool
+## Task 7: `weeek_add_comment` MCP tool — **SKIPPED**
 
-**SKIP THIS TASK** if Task 0 found that the WEEEK API does not expose a create-comment endpoint.
+**SKIPPED.** Task 0 confirmed the WEEEK Public API does not expose comment endpoints. Do not implement.
 
 **Files:**
 - Create: `src/tools/write/add-comment.ts`
@@ -1194,7 +1202,7 @@ git commit -m "feat(tools): add weeek_add_comment MCP write tool"
 ```markdown
 ---
 name: weeek-start
-description: Use when the user wants to start work on a WEEEK task — by ID ("/weeek-start 1234") or natural language ("начни задачу WEEEK-1234", "start task 1234"). Loads the task, pulls comment history for cross-session context, suggests a branch name from .weeek.json, and offers to move the task into the In Progress column.
+description: Use when the user wants to start work on a WEEEK task — by ID ("/weeek-start 1234") or natural language ("начни задачу WEEEK-1234", "start task 1234"). Loads the task, suggests a branch name from .weeek.json, and offers to move the task into the In Progress column.
 ---
 
 # weeek-start
@@ -1207,21 +1215,18 @@ Use this skill when the user explicitly wants to begin work on a specific WEEEK 
 
 2. Call `weeek_get_task({ task_id: "<id>" })`. Show a short summary to the user: title, current status (column), assignee, due date, priority. Quote the description's first 1–2 paragraphs only — do not dump the full body.
 
-3. Call `weeek_list_comments({ task_id: "<id>" })`. If there are comments, surface them as cross-session context, especially anything tagged `[backend]`, `[frontend]`, `[infra]`, etc. This is how the user sees what was done in other repos.
-
-4. Read `.weeek.json` from the repo root (walk up from cwd if needed). If it has a `branchTemplate`, render it with `{id}` and `{slug}` (slug = lowercase kebab from the title, max 5 words). Compare with the current git branch:
+3. Read `.weeek.json` from the repo root (walk up from cwd if needed). If it has a `branchTemplate`, render it with `{id}` and `{slug}` (slug = lowercase kebab from the title, max 5 words). Compare with the current git branch:
    - If the current branch matches the template → skip the branch suggestion.
    - Otherwise, suggest `git switch -c <rendered>` and wait for confirmation before running it.
 
-5. If the task has a `boardId`, call `weeek_list_board_columns({ board_id: "<boardId>" })`. Try to match the current column against `.weeek.json`'s `statusHints.inProgress` (case-insensitive substring match). If exactly one column matches and the task is not already in it, ask: "Move the task to the **<column-name>** column?". On yes → `weeek_move_task`. If 0 or >1 matches, present the full ordered column list and ask the user to pick.
+4. If the task has a `boardId`, call `weeek_list_board_columns({ board_id: "<boardId>" })`. Try to match the current column against `.weeek.json`'s `statusHints.inProgress` (case-insensitive substring match). If exactly one column matches and the task is not already in it, ask: "Move the task to the **<column-name>** column?". On yes → `weeek_move_task`. If 0 or >1 matches, present the full ordered column list and ask the user to pick.
 
-6. Never call any write tool (`weeek_move_task`, `weeek_update_task`, etc.) without explicit user confirmation in the same turn.
+5. Never call any write tool (`weeek_move_task`, `weeek_update_task`, etc.) without explicit user confirmation in the same turn.
 
 ## What this skill does NOT do
 
 - Does not create branches without confirmation.
 - Does not assume "In Progress" maps to a specific column without `statusHints` or user confirmation.
-- Does not post comments — that is `weeek-log`.
 ```
 
 - [ ] **Step 2: Commit**
@@ -1402,8 +1407,6 @@ Use this skill when the user wants to progress a task forward in its board's wor
    - If the destination matches `statusHints.done` → call `weeek_complete_task({ task_id })`.
    - Otherwise → call `weeek_move_task({ task_id, board_column_id: <chosen> })`.
 
-7. After the move succeeds, ask: "Add a handoff comment summarising what changed?". If yes, branch into the same flow as `weeek-log` (build a draft from `git log` + `git diff --stat`, show, confirm, post via `weeek_add_comment`). Especially valuable on `→ Review` and `→ Testing` transitions.
-
 ## What this skill does NOT do
 
 - Does not skip stages without explicit user confirmation. If the menu offers Review and Testing and Done, the user picks one — the skill does not jump straight to Done.
@@ -1429,7 +1432,7 @@ git commit -m "feat(plugin): add weeek-advance skill for multi-stage workflows"
 ```markdown
 ---
 name: weeek-context
-description: Use when the user mentions a WEEEK task ID without an action verb — "/weeek-context 1234", "tell me about WEEEK-1234", "что это за задача". Read-only summary of a task, its column, and its comments. Useful when SessionStart auto-detection didn't fire.
+description: Use when the user mentions a WEEEK task ID without an action verb — "/weeek-context 1234", "tell me about WEEEK-1234", "что это за задача". Read-only summary of a task and its column. Useful when SessionStart auto-detection didn't fire.
 ---
 
 # weeek-context
@@ -1444,24 +1447,18 @@ Use this skill when the user wants to read about a specific task without doing a
 
 3. If the task has a `boardId`, call `weeek_list_board_columns({ board_id })` to translate its `boardColumnId` into a human column name.
 
-4. Call `weeek_list_comments({ task_id })`. Render at most the last 10 comments inline; if more exist, mention "(N more older comments — ask if you want them)".
-
-5. Render the summary as compact markdown:
+4. Render the summary as compact markdown:
 
    ```markdown
    ### WEEEK-<id> <title>
    **Status:** <column-name> · **Assignee:** <name> · **Due:** <date>
 
    <description first paragraph or two>
-
-   #### Recent comments
-   - **<author>** (<date>): <body>
-   - ...
    ```
 
 ## What this skill does NOT do
 
-- Does not call any write tool. If the user asks to do something, route to the appropriate skill (`weeek-start`, `weeek-advance`, `weeek-log`).
+- Does not call any write tool. If the user asks to do something, route to the appropriate skill (`weeek-start`, `weeek-advance`).
 ```
 
 - [ ] **Step 2: Commit**
@@ -1473,9 +1470,9 @@ git commit -m "feat(plugin): add weeek-context read-only skill"
 
 ---
 
-## Task 13: `weeek-log` skill
+## Task 13: `weeek-log` skill — **SKIPPED**
 
-**SKIP THIS TASK** if Task 0 found that the WEEEK API does not expose a create-comment endpoint.
+**SKIPPED.** Task 0 confirmed the WEEEK Public API does not expose comment endpoints. Do not implement.
 
 **Files:**
 - Create: `plugin/skills/weeek-log/SKILL.md`
@@ -1630,8 +1627,7 @@ IDEs, and Cursor.
 | `/weeek-today` | Your tasks today, grouped by project and column. |
 | `/weeek-standup` | Yesterday / Today / Blockers from recent commits + WEEEK status. |
 | `/weeek-advance` | Move task to next workflow stage. Supports multi-stage boards. |
-| `/weeek-context <id>` | Read-only task summary + comments. |
-| `/weeek-log` | Record progress as a comment — shared across repos working on the same task. |
+| `/weeek-context <id>` | Read-only task summary. |
 
 ### Hooks
 
@@ -1732,17 +1728,9 @@ echo '{"tool_name":"Bash","tool_input":{"command":"git commit -m \"WEEEK-77 fix\
 ```
 Expected: a JSON line on stdout containing `77` and `/weeek-advance`.
 
-- [ ] **Step 7: (Optional, if you have a real WEEEK token in env) Smoke test new MCP tools**
+- [ ] **Step 7: Commit any verification fixups (if needed)**
 
-```bash
-WEEEK_API_TOKEN=$WEEEK_API_TOKEN \
-  npx --yes @modelcontextprotocol/inspector node dist/index.js
-```
-In the inspector UI: invoke `weeek_list_comments` and `weeek_add_comment` against a known task ID. Confirm the responses match the API verification done in Task 0.
-
-- [ ] **Step 8: Commit any verification fixups (if needed)**
-
-If steps 3 or 7 surface an issue, fix it and commit. Otherwise this task produces no commits.
+If steps 3 surfaces an issue, fix it and commit. Otherwise this task produces no commits.
 
 ---
 
