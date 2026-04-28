@@ -31,16 +31,19 @@ This buys three properties:
 
 ### 2.2 Repository layout
 
-New files under `plugin/`:
+New files under `plugin/` (as shipped — see §"Implementation deltas" below for what was dropped vs the original design intent):
 
 ```
 plugin/
 ├── .claude-plugin/
-│   ├── plugin.json              (existing)
-│   └── hooks.json               (NEW)
+│   └── plugin.json              (existing — manifest only; per Claude Code
+│                                 convention, hooks/skills/commands MUST NOT
+│                                 live inside .claude-plugin/)
 ├── .mcp.json                    (existing)
 ├── config.schema.json           (NEW — JSON Schema for .weeek.json)
 ├── hooks/                       (NEW)
+│   ├── hooks.json               (registration; auto-discovered by
+│   │                             Claude Code at this path)
 │   ├── detect-task-on-session.mjs
 │   └── detect-task-on-commit.mjs
 ├── lib/                         (NEW — zero-dep helpers shared by hooks)
@@ -50,21 +53,22 @@ plugin/
     ├── weeek-today/SKILL.md
     ├── weeek-standup/SKILL.md
     ├── weeek-advance/SKILL.md
-    ├── weeek-context/SKILL.md
-    └── weeek-log/SKILL.md
-```
-
-New files under `src/` (MCP tools backing the new comment skill):
-
-```
-src/tools/read/list-comments.ts      (NEW)
-src/tools/write/add-comment.ts       (NEW)
+    └── weeek-context/SKILL.md
 ```
 
 Updated files:
-- `src/tools/read/index.ts` and `src/tools/write/index.ts` — register new tools.
-- `package.json` — verify `"files"` includes `plugin/**`.
-- `README.md` — add Configuration section.
+- `package.json` — `"files"` includes `plugin`.
+- `README.md` — Configuration / Skills / Hooks sections.
+- `CLAUDE.md` — Plugin layer pointer.
+
+#### Implementation deltas (post-Task-0)
+
+Two pieces of the original design were dropped after the gate verification:
+
+- A `weeek-log` skill that would record session progress as a task comment.
+- Two MCP tools backing it: `weeek_list_comments` (read) and `weeek_add_comment` (write).
+
+The WEEEK Public API v1 does not expose comment endpoints — only the internal workspace-scoped session-cookie API does. The mitigation listed under §"Risks & Mitigations" Risk #1 was applied: those three components are out of scope for this iteration. References to `weeek_list_comments` were also removed from `weeek-start` and `weeek-context` and from the SessionStart hook's injected context message.
 
 ### 2.3 Why hooks live as `.mjs` Node scripts
 
@@ -90,8 +94,8 @@ Claude Code starts session
                   additionalContext:
                     "Repo branch '<branch>' references WEEEK task <id>.
                      If the user asks about this work, consider calling
-                     weeek_get_task and weeek_list_comments. Do not announce
-                     proactively unless asked." } }
+                     weeek_get_task. Do not announce proactively unless
+                     asked." } }
 ```
 
 ### 3.2 PostToolUse on `git commit` flow
@@ -121,11 +125,10 @@ Agent ran Bash with `git commit ...`
 User: /weeek-start 1234
 Agent reads skill markdown → executes the steps:
     1. weeek_get_task({ id: 1234 })
-    2. weeek_list_comments({ taskId: 1234 })
-    3. Read .weeek.json branchTemplate → suggest `git switch -c …`
-    4. weeek_list_board_columns({ boardId })
+    2. Read .weeek.json branchTemplate → suggest `git switch -c …`
+    3. weeek_list_board_columns({ boardId })
        → match against statusHints.inProgress
-    5. Confirm with user → weeek_move_task to in-progress column
+    4. Confirm with user → weeek_move_task to in-progress column
 ```
 
 ## 4. Components
@@ -213,7 +216,7 @@ Draft-07 chosen for the broadest IDE support without quirks. The schema only nee
 - Outputs: hook protocol JSON on stdout, or empty stdout + exit 0.
 - Failure mode: same as SessionStart — log to stderr, exit 0, never block.
 
-### 4.5 `plugin/.claude-plugin/hooks.json`
+### 4.5 `plugin/hooks/hooks.json`
 
 ```json
 {
@@ -371,7 +374,7 @@ Both tools follow the existing patterns in `src/tools/read/` and `src/tools/writ
 In this work item:
 
 1. `plugin/config.schema.json` — JSON Schema draft-07 for `.weeek.json`.
-2. `plugin/.claude-plugin/hooks.json` — hook registration.
+2. `plugin/hooks/hooks.json` — hook registration.
 3. `plugin/lib/task-detector.mjs` — zero-dep helper.
 4. `plugin/hooks/detect-task-on-session.mjs` — SessionStart hook.
 5. `plugin/hooks/detect-task-on-commit.mjs` — PostToolUse hook.

@@ -100,13 +100,52 @@ The `$schema` URL provides autocomplete and validation in VS Code, JetBrains IDE
 
 ## Skills
 
-| Skill | What it does |
-|-------|--------------|
-| `/weeek-start <id>` | Pull task context, suggest branch, optionally move to In Progress. |
-| `/weeek-today` | Your tasks today, grouped by project and column. |
-| `/weeek-standup` | Yesterday / Today / Blockers from recent commits + WEEEK status. |
-| `/weeek-advance` | Move task to next workflow stage. Supports multi-stage boards. |
-| `/weeek-context <id>` | Read-only task summary. |
+The plugin ships five skills. All are namespaced under `claude-weeek` (e.g. `/claude-weeek:weeek-start`). Triggers below are examples — each skill's description in `SKILL.md` covers a wider set of natural-language phrases.
+
+### `weeek-start` — start work on a task
+
+**Triggers:** `/weeek-start 1234`, `/weeek-start WEEEK-1234`, "start task 1234", "начни задачу WEEEK-1234".
+
+Loads the task and prepares the workspace for work on it:
+1. Calls `weeek_get_task` and shows a short summary (title, status, assignee, due date, priority, first paragraphs of description).
+2. If `.weeek.json` defines `branchTemplate` (e.g. `feature/WEEEK-{id}-{slug}`), suggests a `git switch -c <rendered>` command. Never switches branches without confirmation.
+3. If the task has a board, calls `weeek_list_board_columns` and matches the current column against `statusHints.inProgress`. Asks before moving — single match → confirm, ambiguous → menu, no match → no move.
+
+Never calls a write tool without explicit confirmation in the same turn.
+
+### `weeek-today` — what's on my plate
+
+**Triggers:** `/weeek-today`, "what's on my plate", "мои задачи на сегодня", "что в работе".
+
+Read-only daily list. Resolves the current user via `git config user.email`, then for each active project calls `weeek_list_tasks` filtered to assigned-to-me. Groups output by project and column. Excludes anything matching `statusHints.done`. If the list is empty, says so plainly — no invented summaries.
+
+### `weeek-standup` — daily summary
+
+**Triggers:** `/weeek-standup`, "make my standup", "что я делал вчера".
+
+Cross-references recent commits with WEEEK task state to produce a Yesterday / Today / Blockers markdown block:
+1. Runs `git log --author="$(git config user.email)" --since="yesterday"`.
+2. Extracts task IDs from each commit subject using the same regex set the hooks use (or `taskIdPatterns` from `.weeek.json`).
+3. Categorises each unique task as Done (column matches `statusHints.done`) vs In Progress.
+4. Renders the markdown. Blockers are echoed only if the user mentions them — never invented.
+
+Read-only. Does not push the report anywhere.
+
+### `weeek-advance` — move task to next workflow stage
+
+**Triggers:** `/weeek-advance`, "переведи в Review", "продвинь задачу", "ready for QA".
+
+Supports any column structure — never assumes a layout. Determines the task ID from the current branch (or asks), reads the board's column order via `weeek_list_board_columns`, and builds an advance menu showing:
+- **Next column** (immediately after current by board order).
+- **Named candidates** — `Review`, `Testing`, `Done` if their columns can be matched against `statusHints.review` / `statusHints.testing` / `statusHints.done`.
+
+User picks; the skill never auto-selects. Calls `weeek_complete_task` if the destination matches `statusHints.done`, otherwise `weeek_move_task`. Multi-stage workflows (In Progress → Review → Testing → Done) are first-class — no jumping stages without explicit confirmation.
+
+### `weeek-context` — read-only task summary
+
+**Triggers:** `/weeek-context 1234`, "tell me about WEEEK-1234", "что это за задача".
+
+Pure information lookup. Calls `weeek_get_task`, translates `boardColumnId` to a column name via `weeek_list_board_columns` if needed, and renders a compact markdown summary. Useful when the SessionStart hook didn't fire (e.g. you're on a non-task branch but want to look up a ticket). Never calls a write tool — if the user asks to act on the task, the agent routes them to `weeek-start` or `weeek-advance`.
 
 ## Hooks
 

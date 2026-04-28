@@ -34,7 +34,7 @@ Dependent edits already applied below in tasks 3, 8, 11, 12, and 15: every refer
 | `plugin/lib/task-detector.mjs` | Zero-dep config loader + regex-based task ID extractor. Used by both hooks. |
 | `plugin/hooks/detect-task-on-session.mjs` | SessionStart hook: branch → task ID → context injection. |
 | `plugin/hooks/detect-task-on-commit.mjs` | PostToolUse hook: `git commit` → task ID → context injection. |
-| `plugin/.claude-plugin/hooks.json` | Registers both hooks with Claude Code. |
+| `plugin/hooks/hooks.json` | Registers both hooks with Claude Code. |
 | `plugin/skills/<name>/SKILL.md` × 5 | Markdown skill instructions for the agent (weeek-start, weeek-today, weeek-standup, weeek-advance, weeek-context). |
 | `tests/lib/task-detector.test.ts` | Unit tests for the detector. |
 | `tests/hooks/detect-task-on-session.test.ts` | Spawn-based tests for the SessionStart hook. |
@@ -715,7 +715,7 @@ git commit -m "feat(plugin): add PostToolUse hook for commit→task context inje
 ## Task 5: Register hooks in `hooks.json`
 
 **Files:**
-- Create: `plugin/.claude-plugin/hooks.json`
+- Create: `plugin/hooks/hooks.json`
 
 - [ ] **Step 1: Write the registration**
 
@@ -744,13 +744,13 @@ git commit -m "feat(plugin): add PostToolUse hook for commit→task context inje
 
 - [ ] **Step 2: Validate JSON parses**
 
-Run: `node -e "JSON.parse(require('fs').readFileSync('plugin/.claude-plugin/hooks.json','utf8'))"`
+Run: `node -e "JSON.parse(require('fs').readFileSync('plugin/hooks/hooks.json','utf8'))"`
 Expected: no output, exit 0.
 
 - [ ] **Step 3: Commit**
 
 ```bash
-git add plugin/.claude-plugin/hooks.json
+git add plugin/hooks/hooks.json
 git commit -m "feat(plugin): register SessionStart and PostToolUse hooks"
 ```
 
@@ -1667,7 +1667,7 @@ Beyond the MCP server, the plugin ships skills and hooks under `plugin/`:
 - `plugin/skills/<name>/SKILL.md` — six skills (`weeek-start`, `weeek-today`,
   `weeek-standup`, `weeek-advance`, `weeek-context`, `weeek-log`).
 - `plugin/hooks/*.mjs` — two passive hooks (SessionStart, PostToolUse on
-  `git commit`) registered via `plugin/.claude-plugin/hooks.json`. Hooks
+  `git commit`) registered via `plugin/hooks/hooks.json`. Hooks
   never call the WEEEK API; they only inject context for the agent.
 - `plugin/lib/task-detector.mjs` — zero-dependency regex detector shared by
   both hooks. Built-in patterns are documented in the spec; per-repo
