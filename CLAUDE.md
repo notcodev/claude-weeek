@@ -2,7 +2,7 @@
 
 **WEEEK MCP Server**
 
-MCP (Model Context Protocol) сервер для интеграции AI-агентов с таск-трекером WEEEK. Позволяет кодинг-агентам (Claude Desktop, Cursor, и др.) читать задачи, обновлять статусы, оставлять комментарии и навигировать по проектам/доскам через WEEEK Public API. Распространяется как npm-пакет (`weeek-mcp-server`), запускается через `npx`.
+MCP (Model Context Protocol) сервер для интеграции AI-агентов с таск-трекером WEEEK. Позволяет кодинг-агентам (Claude Desktop, Cursor, и др.) читать задачи, обновлять статусы, оставлять комментарии и навигировать по проектам/доскам через WEEEK Public API. Распространяется как npm-пакет (`claude-weeek`), запускается через `npx`.
 
 **Core Value:** Кодинг-агенты получают прямой доступ к контексту задач в WEEEK — без переключения контекста разработчиком.
 
@@ -47,7 +47,7 @@ Use the native `fetch` (Node 20+). Zero deps; WEEEK API is a simple Bearer-token
 ## Package.json Notes for npx Distribution
 
 - `"type": "module"` — ESM throughout.
-- `"bin": { "weeek-mcp-server": "./dist/index.js" }` — single entry, runs without a subcommand.
+- `"bin": { "claude-weeek": "./dist/index.js" }` — single entry, runs without a subcommand.
 - Entry file `src/index.ts` must keep `#!/usr/bin/env node` as line 1 (tsdown propagates it).
 - `"files": ["dist", ...]` — prevents source files and dev configs from being published.
 - `"engines": { "node": ">=20.0.0" }` — protects against Node 18 fetch edge cases.

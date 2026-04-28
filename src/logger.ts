@@ -9,7 +9,7 @@
  * at the tooling layer: console.log is a lint error, console.error/warn are allowed.
  */
 
-const PREFIX = '[weeek-mcp]'
+const PREFIX = '[claude-weeek]'
 
 function format(
   level: string,

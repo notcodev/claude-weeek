@@ -24,7 +24,7 @@ import { logger } from './logger.js'
 import { registerReadTools } from './tools/read/index.js'
 import { registerWriteTools } from './tools/write/index.js'
 
-const SERVER_NAME = 'weeek-mcp-server'
+const SERVER_NAME = 'claude-weeek'
 const SERVER_VERSION = '0.1.0'
 
 async function main(): Promise<void> {

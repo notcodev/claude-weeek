@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to `weeek-mcp-server` will be documented in this file.
+All notable changes to `claude-weeek` will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -11,7 +11,7 @@ Initial release. MCP server for the WEEEK task tracker.
 
 ### Added
 
-- Stdio MCP server entry point (`weeek-mcp-server` bin).
+- Stdio MCP server entry point (`claude-weeek` bin).
 - Bearer token auth via `WEEEK_API_TOKEN` environment variable.
 - Centralized `WeeekApiClient` with 30s timeout, error normalization, and stderr-only logging.
 - 7 read tools: `weeek_list_projects`, `weeek_get_project`, `weeek_list_boards`, `weeek_list_board_columns`, `weeek_list_tasks`, `weeek_get_task`, `weeek_list_task_comments`.
