@@ -73,12 +73,12 @@ export function detectTaskId(text, patterns) {
 
 export function emitContext(eventName, message) {
   process.stdout.write(
-    JSON.stringify({
+    `${JSON.stringify({
       hookSpecificOutput: {
         hookEventName: eventName,
         additionalContext: message,
       },
-    }),
+    })}\n`,
   )
 }
 

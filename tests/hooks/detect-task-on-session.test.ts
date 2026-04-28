@@ -69,5 +69,6 @@ describe('detect-task-on-session hook', () => {
     expect(parsed.hookSpecificOutput.additionalContext).toContain(
       'weeek_get_task',
     )
+    expect(r.stderr).toBe('')
   })
 })
