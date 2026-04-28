@@ -1,19 +1,14 @@
-# weeek-mcp-server
+# claude-weeek
 
-MCP (Model Context Protocol) server for the [WEEEK](https://weeek.net) task tracker. Gives AI coding agents (Claude Desktop, Cursor, Cline, and any other MCP client) direct read/write access to WEEEK projects, boards, tasks, and comments — no context switching.
+[Claude Code](https://claude.com/claude-code) plugin for the [WEEEK](https://weeek.net) task tracker. Gives Claude direct read/write access to WEEEK projects, boards, tasks, and comments — no context switching.
 
 ## Features
 
 - **12 tools** — 7 read (projects, boards, columns, tasks, comments) + 5 write (create/update/move/complete tasks, post comments)
-- **Read/write split** — tools are grouped so MCP clients can auto-approve reads while gating writes
-- **Stdio transport** — zero server infrastructure, runs via `npx`
+- **Read/write split** — tools are grouped so reads can be auto-approved while writes stay gated
 - **Token auth** — single `WEEEK_API_TOKEN` env var, never logged
 - **Safe defaults** — list tools paginate (default 20, max 50) so responses stay under the 25k token MCP limit
 - **Structured errors** — API failures return `isError: true` with a human-readable message, the server never crashes
-
-## Installation
-
-No installation needed — configure your MCP client to run it via `npx`.
 
 ## Getting a WEEEK API Token
 
@@ -22,85 +17,31 @@ No installation needed — configure your MCP client to run it via `npx`.
 3. Generate a personal API token.
 4. Treat it like a password — it grants full read/write access to your workspace. Rotate it if it leaks.
 
-## Configuration
+Export it before launching Claude Code so the plugin can read it from the environment:
 
-### Claude Desktop
-
-Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows):
-
-```json
-{
-  "mcpServers": {
-    "weeek": {
-      "command": "npx",
-      "args": ["-y", "weeek-mcp-server"],
-      "env": {
-        "WEEEK_API_TOKEN": "your-weeek-token-here"
-      }
-    }
-  }
-}
+```bash
+export WEEEK_API_TOKEN="your-weeek-token-here"
 ```
 
-Restart Claude Desktop.
+## Installation
 
-### Cursor
+Install via the Claude Code plugin marketplace.
 
-Edit `~/.cursor/mcp.json` (or use **Cursor Settings → MCP → Add new MCP server**):
+### 1. Add the marketplace
 
-```json
-{
-  "mcpServers": {
-    "weeek": {
-      "command": "npx",
-      "args": ["-y", "weeek-mcp-server"],
-      "env": {
-        "WEEEK_API_TOKEN": "your-weeek-token-here"
-      }
-    }
-  }
-}
-```
-
-### Generic MCP client
-
-Any MCP client that supports stdio transport can launch:
+In Claude Code, run:
 
 ```
-command: npx
-args: ["-y", "weeek-mcp-server"]
-env: { WEEEK_API_TOKEN: "<your token>" }
+/plugin marketplace add notcodev/notcodev-marketplace
 ```
 
-## NVM Workaround (IMPORTANT for nvm users)
+### 2. Install the plugin
 
-If you installed Node via [nvm](https://github.com/nvm-sh/nvm), GUI applications (Claude Desktop, Cursor) do **not** source your shell startup files, so `npx` is not on their `PATH`. You will see `spawn npx ENOENT` in the client logs.
+```
+/plugin install claude-weeek@notcodev-marketplace
+```
 
-**Fix:** use the absolute path to your nvm npx binary.
-
-1. In your terminal, run:
-   ```bash
-   which npx
-   ```
-   Example output: `/Users/you/.nvm/versions/node/v22.0.0/bin/npx`
-
-2. Put that absolute path in your MCP client config as the `command`:
-
-   ```json
-   {
-     "mcpServers": {
-       "weeek": {
-         "command": "/Users/you/.nvm/versions/node/v22.0.0/bin/npx",
-         "args": ["-y", "weeek-mcp-server"],
-         "env": {
-           "WEEEK_API_TOKEN": "your-weeek-token-here"
-         }
-       }
-     }
-   }
-   ```
-
-This is the single most common setup failure across all npx-based MCP servers. If you upgrade Node via nvm, update the path.
+Claude Code will register the MCP server automatically. Restart the session if the tools don't appear immediately.
 
 ## Tools
 
@@ -139,33 +80,32 @@ All tools are prefixed `weeek_`. Read tools are side-effect free and safe for au
 
 | Symptom | Fix |
 |---------|-----|
-| `spawn npx ENOENT` in client logs | You are using nvm — see the [NVM Workaround](#nvm-workaround-important-for-nvm-users) section above. |
-| `WEEEK_API_TOKEN environment variable is required` | The `env` block is missing or empty in your MCP client config. |
+| `WEEEK_API_TOKEN environment variable is required` | Export the token in the shell that launched Claude Code: `export WEEEK_API_TOKEN=...`. |
 | `Invalid WEEEK_API_TOKEN` | Token is wrong, revoked, or expired — regenerate in WEEEK workspace settings. |
-| Server disconnects immediately after starting | You are on Node < 20. Upgrade Node (`nvm install 20`) and update your config path. |
+| Server disconnects immediately after starting | You are on Node < 20. Upgrade Node (`nvm install 20`) and relaunch Claude Code from the upgraded shell. |
 | Tool returns "Resource not found (404)" | The ID doesn't exist in the workspace — list the parent resource first (e.g., `weeek_list_projects` before `weeek_get_project`). |
 
 ## Development
 
 ```bash
-git clone <this-repo>
-cd weeek-mcp-server
-npm install
-npm run build
-npm test
+git clone https://github.com/notcodev/claude-weeek.git
+cd claude-weeek
+pnpm install
+pnpm build
+pnpm test
 ```
 
 Scripts:
-- `npm run build` — compile TypeScript to `dist/`
-- `npm run dev` — run from source via `tsx`
-- `npm run lint` — ESLint (enforces no-console rule for stdio safety)
-- `npm run typecheck` — `tsc --noEmit`
-- `npm test` — vitest unit tests
+- `pnpm build` — bundle to `dist/` via tsdown
+- `pnpm dev` — run from source via `tsx`
+- `pnpm lint` — ESLint (enforces no-console rule for stdio safety)
+- `pnpm typecheck` — `tsc --noEmit`
+- `pnpm test` — vitest unit tests
 
 To smoke-test the built binary:
 
 ```bash
-npm run build
+pnpm build
 WEEEK_API_TOKEN=test node dist/index.js
 # server blocks on stdin — press Ctrl+C to exit
 ```
