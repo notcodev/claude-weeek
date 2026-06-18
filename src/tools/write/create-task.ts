@@ -9,11 +9,15 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
  */
 import { z } from 'zod'
 
-import type { WeeekApiClient } from '../../client/weeek-api-client.js'
+import type { WorkspaceRegistry } from '../../workspace-registry.js'
 
 import { toMcpError } from '../../errors.js'
 import { logger } from '../../logger.js'
 import { jsonContent } from '../read/_helpers.js'
+import {
+  resolveClient,
+  workspaceParamSchema,
+} from '../workspace-param.js'
 
 function unwrapTask(raw: unknown): unknown {
   if (raw && typeof raw === 'object' && 'task' in (raw as object)) {
@@ -23,6 +27,7 @@ function unwrapTask(raw: unknown): unknown {
 }
 
 const inputSchema = {
+  ...workspaceParamSchema,
   title: z
     .string()
     .min(1)
@@ -79,7 +84,7 @@ const inputSchema = {
 
 export function registerCreateTask(
   server: McpServer,
-  client: WeeekApiClient,
+  registry: WorkspaceRegistry,
 ): void {
   server.registerTool(
     'weeek_create_task',
@@ -89,6 +94,7 @@ export function registerCreateTask(
       inputSchema,
     },
     async (args: {
+      workspace?: string
       title: string
       project_id: string
       description?: string
@@ -99,6 +105,7 @@ export function registerCreateTask(
       date_end?: string
     }) => {
       try {
+        const client = resolveClient(registry, args.workspace)
         const body: Record<string, unknown> = {
           title: args.title,
           projectId: args.project_id,

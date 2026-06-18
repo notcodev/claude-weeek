@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { WeeekApiError } from '../../src/errors.js'
 import { registerCompleteTask } from '../../src/tools/write/complete-task.js'
+import { fakeRegistry } from './_registry.js'
 
 interface CompleteArgs {
   completed?: boolean
@@ -58,8 +59,8 @@ describe('weeek_complete_task tool', () => {
         task: { id: 't1', isCompleted: true },
       })),
       patch: vi.fn(),
-    } as unknown as Parameters<typeof registerCompleteTask>[1]
-    registerCompleteTask(fake.server, client)
+    }
+    registerCompleteTask(fake.server, fakeRegistry(client))
     expect(fake.getName()).toBe('weeek_complete_task')
   })
 
@@ -69,8 +70,8 @@ describe('weeek_complete_task tool', () => {
       post: vi.fn(),
       put: vi.fn(),
       patch: vi.fn(),
-    } as unknown as Parameters<typeof registerCompleteTask>[1]
-    registerCompleteTask(fake.server, client)
+    }
+    registerCompleteTask(fake.server, fakeRegistry(client))
     const desc = fake.getDescription()
     expect(desc).toMatch(/weeek_move_task/)
     expect(desc).toMatch(/weeek_update_task/)
@@ -86,8 +87,8 @@ describe('weeek_complete_task tool', () => {
       post: vi.fn(),
       put: putFn,
       patch: vi.fn(),
-    } as unknown as Parameters<typeof registerCompleteTask>[1]
-    registerCompleteTask(fake.server, client)
+    }
+    registerCompleteTask(fake.server, fakeRegistry(client))
 
     await fake.getHandler()({ task_id: 't1' })
 
@@ -105,8 +106,8 @@ describe('weeek_complete_task tool', () => {
       post: vi.fn(),
       put: putFn,
       patch: vi.fn(),
-    } as unknown as Parameters<typeof registerCompleteTask>[1]
-    registerCompleteTask(fake.server, client)
+    }
+    registerCompleteTask(fake.server, fakeRegistry(client))
 
     await fake.getHandler()({ task_id: 't1', completed: false })
     const body = putFn.mock.calls[0]![1] as Record<string, unknown>
@@ -121,8 +122,8 @@ describe('weeek_complete_task tool', () => {
         throw new WeeekApiError(404, 'task not found')
       }),
       patch: vi.fn(),
-    } as unknown as Parameters<typeof registerCompleteTask>[1]
-    registerCompleteTask(fake.server, client)
+    }
+    registerCompleteTask(fake.server, fakeRegistry(client))
 
     const res = await fake.getHandler()({ task_id: 'missing' })
     expect(res.isError).toBe(true)

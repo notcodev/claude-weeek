@@ -11,7 +11,7 @@
  */
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 
-import type { WeeekApiClient } from '../../client/weeek-api-client.js'
+import type { WorkspaceRegistry } from '../../workspace-registry.js'
 
 import { logger } from '../../logger.js'
 import { registerCompleteTask } from './complete-task.js'
@@ -21,15 +21,15 @@ import { registerUpdateTask } from './update-task.js'
 
 export function registerWriteTools(
   server: McpServer,
-  client: WeeekApiClient,
+  registry: WorkspaceRegistry,
 ): void {
   // Task authoring (Plan 03-01)
-  registerCreateTask(server, client)
-  registerUpdateTask(server, client)
+  registerCreateTask(server, registry)
+  registerUpdateTask(server, registry)
 
   // Task lifecycle (Plan 03-02)
-  registerMoveTask(server, client)
-  registerCompleteTask(server, client)
+  registerMoveTask(server, registry)
+  registerCompleteTask(server, registry)
 
   logger.info('registerWriteTools: 4 write tools registered')
 }

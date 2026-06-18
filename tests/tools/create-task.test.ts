@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { WeeekApiError } from '../../src/errors.js'
 import { registerCreateTask } from '../../src/tools/write/create-task.js'
+import { fakeRegistry } from './_registry.js'
 
 interface CreateArgs {
   assignee_id?: string
@@ -64,8 +65,8 @@ describe('weeek_create_task tool', () => {
       })),
       put: vi.fn(),
       patch: vi.fn(),
-    } as unknown as Parameters<typeof registerCreateTask>[1]
-    registerCreateTask(fake.server, client)
+    }
+    registerCreateTask(fake.server, fakeRegistry(client))
     expect(fake.name()).toBe('weeek_create_task')
   })
 
@@ -75,8 +76,8 @@ describe('weeek_create_task tool', () => {
       post: vi.fn(),
       put: vi.fn(),
       patch: vi.fn(),
-    } as unknown as Parameters<typeof registerCreateTask>[1]
-    registerCreateTask(fake.server, client)
+    }
+    registerCreateTask(fake.server, fakeRegistry(client))
     const desc = fake.description()
     expect(desc).toMatch(/create/i)
     expect(desc).toMatch(/weeek_update_task/)
@@ -89,8 +90,8 @@ describe('weeek_create_task tool', () => {
       post: postFn,
       put: vi.fn(),
       patch: vi.fn(),
-    } as unknown as Parameters<typeof registerCreateTask>[1]
-    registerCreateTask(fake.server, client)
+    }
+    registerCreateTask(fake.server, fakeRegistry(client))
 
     await fake.handler()({
       title: 'Ship it',
@@ -126,8 +127,8 @@ describe('weeek_create_task tool', () => {
       post: postFn,
       put: vi.fn(),
       patch: vi.fn(),
-    } as unknown as Parameters<typeof registerCreateTask>[1]
-    registerCreateTask(fake.server, client)
+    }
+    registerCreateTask(fake.server, fakeRegistry(client))
 
     await fake.handler()({ title: 'minimal', project_id: 'p1' })
     const body = postFn.mock.calls[0]![1] as Record<string, unknown>
@@ -146,8 +147,8 @@ describe('weeek_create_task tool', () => {
       })),
       put: vi.fn(),
       patch: vi.fn(),
-    } as unknown as Parameters<typeof registerCreateTask>[1]
-    registerCreateTask(fake.server, client)
+    }
+    registerCreateTask(fake.server, fakeRegistry(client))
 
     const res = await fake.handler()({
       title: 'hello',
@@ -167,8 +168,8 @@ describe('weeek_create_task tool', () => {
       post: vi.fn(async () => ({ id: 't2', title: 'raw' })),
       put: vi.fn(),
       patch: vi.fn(),
-    } as unknown as Parameters<typeof registerCreateTask>[1]
-    registerCreateTask(fake.server, client)
+    }
+    registerCreateTask(fake.server, fakeRegistry(client))
     const res = await fake.handler()({
       title: 'raw',
       project_id: 'p1',
@@ -185,8 +186,8 @@ describe('weeek_create_task tool', () => {
       }),
       put: vi.fn(),
       patch: vi.fn(),
-    } as unknown as Parameters<typeof registerCreateTask>[1]
-    registerCreateTask(fake.server, client)
+    }
+    registerCreateTask(fake.server, fakeRegistry(client))
 
     const res = await fake.handler()({ title: 'x', project_id: 'p1' })
     expect(res.isError).toBe(true)

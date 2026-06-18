@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { WeeekApiError } from '../../src/errors.js'
 import { registerMoveTask } from '../../src/tools/write/move-task.js'
+import { fakeRegistry } from './_registry.js'
 
 interface MoveArgs {
   board_column_id: string
@@ -57,8 +58,8 @@ describe('weeek_move_task tool', () => {
       post: vi.fn(),
       put: vi.fn(async () => ({ task: { id: 't1' } })),
       patch: vi.fn(),
-    } as unknown as Parameters<typeof registerMoveTask>[1]
-    registerMoveTask(fake.server, client)
+    }
+    registerMoveTask(fake.server, fakeRegistry(client))
     expect(fake.getName()).toBe('weeek_move_task')
   })
 
@@ -68,8 +69,8 @@ describe('weeek_move_task tool', () => {
       post: vi.fn(),
       put: vi.fn(),
       patch: vi.fn(),
-    } as unknown as Parameters<typeof registerMoveTask>[1]
-    registerMoveTask(fake.server, client)
+    }
+    registerMoveTask(fake.server, fakeRegistry(client))
     const desc = fake.getDescription()
     expect(desc).toMatch(/weeek_list_board_columns/)
     expect(desc).toMatch(/weeek_update_task/)
@@ -85,8 +86,8 @@ describe('weeek_move_task tool', () => {
       post: vi.fn(),
       put: putFn,
       patch: vi.fn(),
-    } as unknown as Parameters<typeof registerMoveTask>[1]
-    registerMoveTask(fake.server, client)
+    }
+    registerMoveTask(fake.server, fakeRegistry(client))
 
     await fake.getHandler()({
       task_id: 't1',
@@ -106,8 +107,8 @@ describe('weeek_move_task tool', () => {
       post: vi.fn(),
       put: putFn,
       patch: vi.fn(),
-    } as unknown as Parameters<typeof registerMoveTask>[1]
-    registerMoveTask(fake.server, client)
+    }
+    registerMoveTask(fake.server, fakeRegistry(client))
 
     await fake.getHandler()({
       task_id: 't1',
@@ -127,8 +128,8 @@ describe('weeek_move_task tool', () => {
         throw new WeeekApiError(404, 'task not found')
       }),
       patch: vi.fn(),
-    } as unknown as Parameters<typeof registerMoveTask>[1]
-    registerMoveTask(fake.server, client)
+    }
+    registerMoveTask(fake.server, fakeRegistry(client))
 
     const res = await fake.getHandler()({
       task_id: 'missing',

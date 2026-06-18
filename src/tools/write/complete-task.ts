@@ -11,11 +11,15 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
  */
 import { z } from 'zod'
 
-import type { WeeekApiClient } from '../../client/weeek-api-client.js'
+import type { WorkspaceRegistry } from '../../workspace-registry.js'
 
 import { toMcpError } from '../../errors.js'
 import { logger } from '../../logger.js'
 import { jsonContent } from '../read/_helpers.js'
+import {
+  resolveClient,
+  workspaceParamSchema,
+} from '../workspace-param.js'
 
 function unwrapTask(raw: unknown): unknown {
   if (raw && typeof raw === 'object' && 'task' in (raw as object)) {
@@ -25,6 +29,7 @@ function unwrapTask(raw: unknown): unknown {
 }
 
 const inputSchema = {
+  ...workspaceParamSchema,
   task_id: z
     .string()
     .min(1)
@@ -42,7 +47,7 @@ const inputSchema = {
 
 export function registerCompleteTask(
   server: McpServer,
-  client: WeeekApiClient,
+  registry: WorkspaceRegistry,
 ): void {
   server.registerTool(
     'weeek_complete_task',
@@ -51,8 +56,13 @@ export function registerCompleteTask(
         "Mark a WEEEK task as COMPLETE or REOPEN a completed task. WRITE OPERATION — the MCP client may prompt for confirmation. Required: task_id. Optional: completed (default true). Pass completed=false to reopen. Returns the updated task. DISTINCT from weeek_move_task: completing a task is a done/undone toggle, independent of which column it lives in. DISTINCT from weeek_update_task: completion is not an editable field — it has its own dedicated semantics in WEEEK. Use this tool when the user says 'mark done', 'complete', 'finish', 'close', 'reopen', or 'uncomplete'. task_id must come from weeek_list_tasks.",
       inputSchema,
     },
-    async (args: { task_id: string; completed?: boolean }) => {
+    async (args: {
+      workspace?: string
+      task_id: string
+      completed?: boolean
+    }) => {
       try {
+        const client = resolveClient(registry, args.workspace)
         const completed = args.completed ?? true
         const body = { isCompleted: completed }
         const raw = await client.put<unknown>(

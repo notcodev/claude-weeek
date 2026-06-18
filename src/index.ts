@@ -54,8 +54,7 @@ async function main(): Promise<void> {
   })
 
   registerReadTools(server, registry)
-  // Write group is migrated in Task 7; until then pass the default client.
-  registerWriteTools(server, registry.resolve())
+  registerWriteTools(server, registry)
 
   const transport = new StdioServerTransport()
 

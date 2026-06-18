@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { WeeekApiError } from '../../src/errors.js'
 import { registerUpdateTask } from '../../src/tools/write/update-task.js'
+import { fakeRegistry } from './_registry.js'
 
 interface UpdateArgs {
   assignee_id?: string
@@ -60,8 +61,8 @@ describe('weeek_update_task tool', () => {
       post: vi.fn(),
       put: vi.fn(async () => ({ task: { id: 't1' } })),
       patch: vi.fn(),
-    } as unknown as Parameters<typeof registerUpdateTask>[1]
-    registerUpdateTask(fake.server, client)
+    }
+    registerUpdateTask(fake.server, fakeRegistry(client))
     expect(fake.getName()).toBe('weeek_update_task')
   })
 
@@ -71,8 +72,8 @@ describe('weeek_update_task tool', () => {
       post: vi.fn(),
       put: vi.fn(),
       patch: vi.fn(),
-    } as unknown as Parameters<typeof registerUpdateTask>[1]
-    registerUpdateTask(fake.server, client)
+    }
+    registerUpdateTask(fake.server, fakeRegistry(client))
     const desc = fake.getDescription()
     expect(desc).toMatch(/weeek_move_task/)
     expect(desc).toMatch(/weeek_complete_task/)
@@ -87,8 +88,8 @@ describe('weeek_update_task tool', () => {
       post: vi.fn(),
       put: putFn,
       patch: vi.fn(),
-    } as unknown as Parameters<typeof registerUpdateTask>[1]
-    registerUpdateTask(fake.server, client)
+    }
+    registerUpdateTask(fake.server, fakeRegistry(client))
 
     await fake.getHandler()({
       task_id: 't1',
@@ -119,8 +120,8 @@ describe('weeek_update_task tool', () => {
       post: vi.fn(),
       put: putFn,
       patch: vi.fn(),
-    } as unknown as Parameters<typeof registerUpdateTask>[1]
-    registerUpdateTask(fake.server, client)
+    }
+    registerUpdateTask(fake.server, fakeRegistry(client))
 
     const res = await fake.getHandler()({ task_id: 't1' })
     expect(res.isError).toBe(true)
@@ -135,8 +136,8 @@ describe('weeek_update_task tool', () => {
         throw new WeeekApiError(403, 'forbidden')
       }),
       patch: vi.fn(),
-    } as unknown as Parameters<typeof registerUpdateTask>[1]
-    registerUpdateTask(fake.server, client)
+    }
+    registerUpdateTask(fake.server, fakeRegistry(client))
 
     const res = await fake.getHandler()({ task_id: 't1', title: 'x' })
     expect(res.isError).toBe(true)
