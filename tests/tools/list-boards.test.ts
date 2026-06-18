@@ -2,11 +2,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { WeeekApiError } from '../../src/errors.js'
 import { registerListBoards } from '../../src/tools/read/list-boards.js'
+import { fakeRegistry } from './_registry.js'
 
 type Handler = (args: {
   project_id: string
   limit?: number
   offset?: number
+  workspace?: string
 }) => Promise<{
   content: Array<{ type: 'text'; text: string }>
   isError?: boolean
@@ -50,7 +52,7 @@ function makeFakeClient(
     post: vi.fn(),
     put: vi.fn(),
     patch: vi.fn(),
-  } as unknown as Parameters<typeof registerListBoards>[1]
+  }
 }
 
 describe('weeek_list_boards tool', () => {
@@ -62,13 +64,13 @@ describe('weeek_list_boards tool', () => {
 
   it('registers under the weeek_list_boards name', () => {
     const client = makeFakeClient(async () => ({ boards: [] }))
-    registerListBoards(fake.server, client)
+    registerListBoards(fake.server, fakeRegistry(client))
     expect(fake.getName()).toBe('weeek_list_boards')
   })
 
   it('description references navigation context tools', () => {
     const client = makeFakeClient(async () => ({ boards: [] }))
-    registerListBoards(fake.server, client)
+    registerListBoards(fake.server, fakeRegistry(client))
     const desc = fake.getDescription()
     expect(desc).toMatch(/weeek_list_projects/)
     expect(desc).toMatch(/weeek_list_board_columns/)
@@ -96,8 +98,8 @@ describe('weeek_list_boards tool', () => {
       post: vi.fn(),
       put: vi.fn(),
       patch: vi.fn(),
-    } as unknown as Parameters<typeof registerListBoards>[1]
-    registerListBoards(fake.server, client)
+    }
+    registerListBoards(fake.server, fakeRegistry(client))
 
     const res = await fake.getHandler()({ project_id: 'proj-1' })
     expect(res.isError).toBeUndefined()
@@ -139,8 +141,8 @@ describe('weeek_list_boards tool', () => {
       post: vi.fn(),
       put: vi.fn(),
       patch: vi.fn(),
-    } as unknown as Parameters<typeof registerListBoards>[1]
-    registerListBoards(fake.server, client)
+    }
+    registerListBoards(fake.server, fakeRegistry(client))
 
     await fake.getHandler()({
       project_id: 'p1',
@@ -156,7 +158,7 @@ describe('weeek_list_boards tool', () => {
     const client = makeFakeClient(async () => {
       throw new WeeekApiError(403, 'forbidden')
     })
-    registerListBoards(fake.server, client)
+    registerListBoards(fake.server, fakeRegistry(client))
 
     const res = await fake.getHandler()({ project_id: 'p1' })
     expect(res.isError).toBe(true)

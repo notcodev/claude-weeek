@@ -1,7 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import type { WeeekApiClient } from '../../src/client/weeek-api-client.js'
+
 import { WeeekApiError } from '../../src/errors.js'
 import { registerListTasks } from '../../src/tools/read/list-tasks.js'
+import { WorkspaceRegistry } from '../../src/workspace-registry.js'
+import { fakeRegistry } from './_registry.js'
 
 type Handler = (args: {
   project_id?: string
@@ -11,6 +15,7 @@ type Handler = (args: {
   is_completed?: boolean
   limit?: number
   offset?: number
+  workspace?: string
 }) => Promise<{
   content: Array<{ type: 'text'; text: string }>
   isError?: boolean
@@ -54,7 +59,7 @@ function makeFakeClient(
     post: vi.fn(),
     put: vi.fn(),
     patch: vi.fn(),
-  } as unknown as Parameters<typeof registerListTasks>[1]
+  }
 }
 
 describe('weeek_list_tasks tool', () => {
@@ -66,13 +71,13 @@ describe('weeek_list_tasks tool', () => {
 
   it('registers under the weeek_list_tasks name', () => {
     const client = makeFakeClient(async () => ({ tasks: [] }))
-    registerListTasks(fake.server, client)
+    registerListTasks(fake.server, fakeRegistry(client))
     expect(fake.getName()).toBe('weeek_list_tasks')
   })
 
   it('description mentions pagination enforcement and sibling tools', () => {
     const client = makeFakeClient(async () => ({ tasks: [] }))
-    registerListTasks(fake.server, client)
+    registerListTasks(fake.server, fakeRegistry(client))
     const desc = fake.getDescription()
     expect(desc).toMatch(/weeek_get_task/)
     expect(desc).toMatch(/pagination/i)
@@ -106,7 +111,7 @@ describe('weeek_list_tasks tool', () => {
         },
       ],
     }))
-    registerListTasks(fake.server, client)
+    registerListTasks(fake.server, fakeRegistry(client))
 
     const res = await fake.getHandler()({})
     expect(res.isError).toBeUndefined()
@@ -156,8 +161,8 @@ describe('weeek_list_tasks tool', () => {
       post: vi.fn(),
       put: vi.fn(),
       patch: vi.fn(),
-    } as unknown as Parameters<typeof registerListTasks>[1]
-    registerListTasks(fake.server, client)
+    }
+    registerListTasks(fake.server, fakeRegistry(client))
 
     await fake.getHandler()({
       project_id: 'p1',
@@ -184,10 +189,35 @@ describe('weeek_list_tasks tool', () => {
     const client = makeFakeClient(async () => {
       throw new WeeekApiError(401, 'unauthorized')
     })
-    registerListTasks(fake.server, client)
+    registerListTasks(fake.server, fakeRegistry(client))
 
     const res = await fake.getHandler()({})
     expect(res.isError).toBe(true)
     expect(res.content[0]?.text).toContain('Invalid WEEEK_API_TOKEN')
+  })
+
+  it('routes to the workspace named in args.workspace', async () => {
+    const calls: string[] = []
+    const mk = (tag: string) =>
+      ({
+        get: vi.fn(async () => {
+          calls.push(tag)
+          return { tasks: [] }
+        }),
+      }) as unknown as WeeekApiClient
+    const reg = new WorkspaceRegistry(
+      new Map([
+        ['main', mk('main')],
+        ['alt', mk('alt')],
+      ]),
+      'main',
+      new Map([
+        ['main', { baseUrl: 'https://m/v1' }],
+        ['alt', { baseUrl: 'https://a/v1' }],
+      ]),
+    )
+    registerListTasks(fake.server, reg)
+    await fake.getHandler()({ workspace: 'alt' })
+    expect(calls).toEqual(['alt'])
   })
 })

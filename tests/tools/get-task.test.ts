@@ -2,8 +2,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { WeeekApiError } from '../../src/errors.js'
 import { registerGetTask } from '../../src/tools/read/get-task.js'
+import { fakeRegistry } from './_registry.js'
 
-type Handler = (args: { task_id: string }) => Promise<{
+type Handler = (args: {
+  task_id: string
+  workspace?: string
+}) => Promise<{
   content: Array<{ type: 'text'; text: string }>
   isError?: boolean
 }>
@@ -44,7 +48,7 @@ function makeFakeClient(getImpl: (path: string) => Promise<unknown>) {
     post: vi.fn(),
     put: vi.fn(),
     patch: vi.fn(),
-  } as unknown as Parameters<typeof registerGetTask>[1]
+  }
 }
 
 describe('weeek_get_task tool', () => {
@@ -58,7 +62,7 @@ describe('weeek_get_task tool', () => {
     const client = makeFakeClient(async () => ({
       task: { id: 't1' },
     }))
-    registerGetTask(fake.server, client)
+    registerGetTask(fake.server, fakeRegistry(client))
     expect(fake.getName()).toBe('weeek_get_task')
   })
 
@@ -66,7 +70,7 @@ describe('weeek_get_task tool', () => {
     const client = makeFakeClient(async () => ({
       task: { id: 't1' },
     }))
-    registerGetTask(fake.server, client)
+    registerGetTask(fake.server, fakeRegistry(client))
     const desc = fake.getDescription()
     expect(desc).toMatch(/weeek_list_tasks/)
   })
@@ -88,8 +92,8 @@ describe('weeek_get_task tool', () => {
       post: vi.fn(),
       put: vi.fn(),
       patch: vi.fn(),
-    } as unknown as Parameters<typeof registerGetTask>[1]
-    registerGetTask(fake.server, client)
+    }
+    registerGetTask(fake.server, fakeRegistry(client))
 
     const res = await fake.getHandler()({ task_id: 'task-99' })
     expect(res.isError).toBeUndefined()
@@ -106,7 +110,7 @@ describe('weeek_get_task tool', () => {
     const client = makeFakeClient(async () => {
       throw new WeeekApiError(404, 'task not found')
     })
-    registerGetTask(fake.server, client)
+    registerGetTask(fake.server, fakeRegistry(client))
 
     const res = await fake.getHandler()({ task_id: 'missing' })
     expect(res.isError).toBe(true)

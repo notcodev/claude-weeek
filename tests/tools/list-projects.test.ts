@@ -2,10 +2,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { WeeekApiError } from '../../src/errors.js'
 import { registerListProjects } from '../../src/tools/read/list-projects.js'
+import { fakeRegistry } from './_registry.js'
 
 type Handler = (args: {
   limit?: number
   offset?: number
+  workspace?: string
 }) => Promise<{
   content: Array<{ type: 'text'; text: string }>
   isError?: boolean
@@ -49,7 +51,7 @@ function makeFakeClient(
     post: vi.fn(),
     put: vi.fn(),
     patch: vi.fn(),
-  } as unknown as Parameters<typeof registerListProjects>[1]
+  }
 }
 
 describe('weeek_list_projects tool', () => {
@@ -61,13 +63,13 @@ describe('weeek_list_projects tool', () => {
 
   it('registers under the weeek_list_projects name', () => {
     const client = makeFakeClient(async () => ({ projects: [] }))
-    registerListProjects(fake.server, client)
+    registerListProjects(fake.server, fakeRegistry(client))
     expect(fake.getName()).toBe('weeek_list_projects')
   })
 
   it("description mentions 'List projects' and references sibling tools", () => {
     const client = makeFakeClient(async () => ({ projects: [] }))
-    registerListProjects(fake.server, client)
+    registerListProjects(fake.server, fakeRegistry(client))
     const desc = fake.getDescription()
     expect(desc).toMatch(/list projects/i)
     // Should guide the agent to related tools
@@ -94,7 +96,7 @@ describe('weeek_list_projects tool', () => {
         ],
       }
     })
-    registerListProjects(fake.server, client)
+    registerListProjects(fake.server, fakeRegistry(client))
     const res = await fake.getHandler()({})
     expect(res.isError).toBeUndefined()
     const payload = JSON.parse(res.content[0]!.text) as {
@@ -128,8 +130,8 @@ describe('weeek_list_projects tool', () => {
       post: vi.fn(),
       put: vi.fn(),
       patch: vi.fn(),
-    } as unknown as Parameters<typeof registerListProjects>[1]
-    registerListProjects(fake.server, client)
+    }
+    registerListProjects(fake.server, fakeRegistry(client))
     await fake.getHandler()({ limit: 5, offset: 10 })
     expect(getFn).toHaveBeenCalledWith('/tm/projects', {
       limit: 5,
@@ -141,7 +143,7 @@ describe('weeek_list_projects tool', () => {
     const client = makeFakeClient(async () => {
       throw new WeeekApiError(404, 'not found')
     })
-    registerListProjects(fake.server, client)
+    registerListProjects(fake.server, fakeRegistry(client))
     const res = await fake.getHandler()({})
     expect(res.isError).toBe(true)
     expect(res.content[0]?.text).toContain('Resource not found')

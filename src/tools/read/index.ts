@@ -11,7 +11,7 @@
  */
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 
-import type { WeeekApiClient } from '../../client/weeek-api-client.js'
+import type { WorkspaceRegistry } from '../../workspace-registry.js'
 
 import { logger } from '../../logger.js'
 import { registerGetProject } from './get-project.js'
@@ -24,20 +24,20 @@ import { registerListWorkspaceMembers } from './list-workspace-members.js'
 
 export function registerReadTools(
   server: McpServer,
-  client: WeeekApiClient,
+  registry: WorkspaceRegistry,
 ): void {
   // Navigation
-  registerListProjects(server, client)
-  registerGetProject(server, client)
-  registerListBoards(server, client)
-  registerListBoardColumns(server, client)
+  registerListProjects(server, registry)
+  registerGetProject(server, registry)
+  registerListBoards(server, registry)
+  registerListBoardColumns(server, registry)
 
   // Tasks
-  registerListTasks(server, client)
-  registerGetTask(server, client)
+  registerListTasks(server, registry)
+  registerGetTask(server, registry)
 
   // Workspace
-  registerListWorkspaceMembers(server, client)
+  registerListWorkspaceMembers(server, registry)
 
   logger.info('registerReadTools: 7 read tools registered')
 }

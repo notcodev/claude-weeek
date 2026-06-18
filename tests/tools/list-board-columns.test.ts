@@ -2,11 +2,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { WeeekApiError } from '../../src/errors.js'
 import { registerListBoardColumns } from '../../src/tools/read/list-board-columns.js'
+import { fakeRegistry } from './_registry.js'
 
 type Handler = (args: {
   board_id: string
   limit?: number
   offset?: number
+  workspace?: string
 }) => Promise<{
   content: Array<{ type: 'text'; text: string }>
   isError?: boolean
@@ -50,7 +52,7 @@ function makeFakeClient(
     post: vi.fn(),
     put: vi.fn(),
     patch: vi.fn(),
-  } as unknown as Parameters<typeof registerListBoardColumns>[1]
+  }
 }
 
 describe('weeek_list_board_columns tool', () => {
@@ -62,13 +64,13 @@ describe('weeek_list_board_columns tool', () => {
 
   it('registers under the weeek_list_board_columns name', () => {
     const client = makeFakeClient(async () => ({ boardColumns: [] }))
-    registerListBoardColumns(fake.server, client)
+    registerListBoardColumns(fake.server, fakeRegistry(client))
     expect(fake.getName()).toBe('weeek_list_board_columns')
   })
 
   it('description references weeek_move_task as the consumer of column ids', () => {
     const client = makeFakeClient(async () => ({ boardColumns: [] }))
-    registerListBoardColumns(fake.server, client)
+    registerListBoardColumns(fake.server, fakeRegistry(client))
     const desc = fake.getDescription()
     expect(desc).toMatch(/weeek_move_task/)
     expect(desc).toMatch(/weeek_list_boards/)
@@ -87,8 +89,8 @@ describe('weeek_list_board_columns tool', () => {
       post: vi.fn(),
       put: vi.fn(),
       patch: vi.fn(),
-    } as unknown as Parameters<typeof registerListBoardColumns>[1]
-    registerListBoardColumns(fake.server, client)
+    }
+    registerListBoardColumns(fake.server, fakeRegistry(client))
 
     const res = await fake.getHandler()({ board_id: 'b1' })
     expect(res.isError).toBeUndefined()
@@ -134,8 +136,8 @@ describe('weeek_list_board_columns tool', () => {
       post: vi.fn(),
       put: vi.fn(),
       patch: vi.fn(),
-    } as unknown as Parameters<typeof registerListBoardColumns>[1]
-    registerListBoardColumns(fake.server, client)
+    }
+    registerListBoardColumns(fake.server, fakeRegistry(client))
 
     await fake.getHandler()({ board_id: 'b1', limit: 3, offset: 9 })
     const query = getFn.mock.calls[0]![1] as Record<string, unknown>
@@ -147,7 +149,7 @@ describe('weeek_list_board_columns tool', () => {
     const client = makeFakeClient(async () => {
       throw new WeeekApiError(404, 'board not found')
     })
-    registerListBoardColumns(fake.server, client)
+    registerListBoardColumns(fake.server, fakeRegistry(client))
 
     const res = await fake.getHandler()({ board_id: 'missing' })
     expect(res.isError).toBe(true)

@@ -18,11 +18,15 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import process from 'node:process'
 
-import { WeeekApiClient } from './client/weeek-api-client.js'
-import { InvalidConfigError, loadConfig, MissingConfigError } from './config.js'
+import {
+  InvalidConfigError,
+  loadConfig,
+  MissingConfigError,
+} from './config.js'
 import { logger } from './logger.js'
 import { registerReadTools } from './tools/read/index.js'
 import { registerWriteTools } from './tools/write/index.js'
+import { createRegistry } from './workspace-registry.js'
 
 const SERVER_NAME = 'claude-weeek'
 const SERVER_VERSION = '0.1.0'
@@ -42,19 +46,16 @@ async function main(): Promise<void> {
     throw err
   }
 
-  const ws = config.workspaces[config.defaultWorkspace]!
-  const client = new WeeekApiClient(ws.token, {
-    baseUrl: ws.baseUrl,
-    timeoutMs: config.requestTimeoutMs,
-  })
+  const registry = createRegistry(config)
 
   const server = new McpServer({
     name: SERVER_NAME,
     version: SERVER_VERSION,
   })
 
-  registerReadTools(server, client)
-  registerWriteTools(server, client)
+  registerReadTools(server, registry)
+  // Write group is migrated in Task 7; until then pass the default client.
+  registerWriteTools(server, registry.resolve())
 
   const transport = new StdioServerTransport()
 

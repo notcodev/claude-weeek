@@ -2,8 +2,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { WeeekApiError } from '../../src/errors.js'
 import { registerGetProject } from '../../src/tools/read/get-project.js'
+import { fakeRegistry } from './_registry.js'
 
-type Handler = (args: { project_id: string }) => Promise<{
+type Handler = (args: {
+  project_id: string
+  workspace?: string
+}) => Promise<{
   content: Array<{ type: 'text'; text: string }>
   isError?: boolean
 }>
@@ -44,7 +48,7 @@ function makeFakeClient(getImpl: (path: string) => Promise<unknown>) {
     post: vi.fn(),
     put: vi.fn(),
     patch: vi.fn(),
-  } as unknown as Parameters<typeof registerGetProject>[1]
+  }
 }
 
 describe('weeek_get_project tool', () => {
@@ -58,13 +62,13 @@ describe('weeek_get_project tool', () => {
     const client = makeFakeClient(async () => ({
       project: { id: 'p1' },
     }))
-    registerGetProject(fake.server, client)
+    registerGetProject(fake.server, fakeRegistry(client))
     expect(fake.getName()).toBe('weeek_get_project')
   })
 
   it('description references sibling tools for navigation context', () => {
     const client = makeFakeClient(async () => ({ project: {} }))
-    registerGetProject(fake.server, client)
+    registerGetProject(fake.server, fakeRegistry(client))
     const desc = fake.getDescription()
     expect(desc).toMatch(/weeek_list_projects/)
     expect(desc).toMatch(/weeek_list_boards/)
@@ -87,8 +91,8 @@ describe('weeek_get_project tool', () => {
       post: vi.fn(),
       put: vi.fn(),
       patch: vi.fn(),
-    } as unknown as Parameters<typeof registerGetProject>[1]
-    registerGetProject(fake.server, client)
+    }
+    registerGetProject(fake.server, fakeRegistry(client))
 
     const res = await fake.getHandler()({ project_id: 'proj-42' })
     expect(res.isError).toBeUndefined()
@@ -108,7 +112,7 @@ describe('weeek_get_project tool', () => {
       id: 'p99',
       title: 'Raw',
     }))
-    registerGetProject(fake.server, client)
+    registerGetProject(fake.server, fakeRegistry(client))
 
     const res = await fake.getHandler()({ project_id: 'p99' })
     expect(res.isError).toBeUndefined()
@@ -124,7 +128,7 @@ describe('weeek_get_project tool', () => {
     const client = makeFakeClient(async () => {
       throw new WeeekApiError(404, 'project not found')
     })
-    registerGetProject(fake.server, client)
+    registerGetProject(fake.server, fakeRegistry(client))
 
     const res = await fake.getHandler()({ project_id: 'missing' })
     expect(res.isError).toBe(true)
