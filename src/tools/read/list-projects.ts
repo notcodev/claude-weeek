@@ -7,10 +7,14 @@
  */
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 
-import type { WeeekApiClient } from '../../client/weeek-api-client.js'
+import type { WorkspaceRegistry } from '../../workspace-registry.js'
 
 import { toMcpError } from '../../errors.js'
 import { logger } from '../../logger.js'
+import {
+  resolveClient,
+  workspaceParamSchema,
+} from '../workspace-param.js'
 import {
   extractArray,
   jsonContent,
@@ -44,11 +48,12 @@ function shapeProject(raw: RawWeeekProject): ShapedProject {
 
 const inputSchema = {
   ...listParamsSchema,
+  ...workspaceParamSchema,
 }
 
 export function registerListProjects(
   server: McpServer,
-  client: WeeekApiClient,
+  registry: WorkspaceRegistry,
 ): void {
   server.registerTool(
     'weeek_list_projects',
@@ -57,8 +62,13 @@ export function registerListProjects(
         "List projects in the WEEEK workspace. Use this FIRST when an agent needs to discover what projects exist before drilling into boards or tasks. Returns an array of projects with id, name, parentId (for nested projects), and isArchived flag. For a specific project's full details, use weeek_get_project with the id returned here. For board discovery within a project, use weeek_list_boards next.",
       inputSchema,
     },
-    async (args: { limit?: number; offset?: number }) => {
+    async (args: {
+      limit?: number
+      offset?: number
+      workspace?: string
+    }) => {
       try {
+        const client = resolveClient(registry, args.workspace)
         const raw = await client.get<unknown>('/tm/projects', {
           limit: args.limit,
           offset: args.offset,

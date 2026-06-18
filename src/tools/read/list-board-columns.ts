@@ -8,10 +8,14 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
  */
 import { z } from 'zod'
 
-import type { WeeekApiClient } from '../../client/weeek-api-client.js'
+import type { WorkspaceRegistry } from '../../workspace-registry.js'
 
 import { toMcpError } from '../../errors.js'
 import { logger } from '../../logger.js'
+import {
+  resolveClient,
+  workspaceParamSchema,
+} from '../workspace-param.js'
 import {
   extractArray,
   jsonContent,
@@ -51,11 +55,12 @@ const inputSchema = {
       'WEEEK board ID whose columns to list. Obtain from weeek_list_boards. Required.',
     ),
   ...listParamsSchema,
+  ...workspaceParamSchema,
 }
 
 export function registerListBoardColumns(
   server: McpServer,
-  client: WeeekApiClient,
+  registry: WorkspaceRegistry,
 ): void {
   server.registerTool(
     'weeek_list_board_columns',
@@ -68,8 +73,10 @@ export function registerListBoardColumns(
       board_id: string
       limit?: number
       offset?: number
+      workspace?: string
     }) => {
       try {
+        const client = resolveClient(registry, args.workspace)
         const raw = await client.get<unknown>('/tm/board-columns', {
           boardId: args.board_id,
           limit: args.limit,

@@ -1,10 +1,11 @@
 import { describe, expect, it, vi } from 'vitest'
 
+import type { WorkspaceRegistry } from '../../src/workspace-registry.js'
+
 import {
   resolveClient,
   workspaceParamSchema,
 } from '../../src/tools/workspace-param.js'
-import type { WorkspaceRegistry } from '../../src/workspace-registry.js'
 
 describe('workspace param helper', () => {
   it('exposes an optional workspace string with a description', () => {

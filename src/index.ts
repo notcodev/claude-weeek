@@ -4,7 +4,7 @@
  *
  * Startup sequence:
  *   1. Load config (validates WEEEK_API_TOKEN — exits with clear error if missing)
- *   2. Instantiate WeeekApiClient with the token and base URL
+ *   2. Build a WorkspaceRegistry from the resolved config
  *   3. Create McpServer with package name + version
  *   4. Register read tool group (Phase 1: empty)
  *   5. Register write tool group (Phase 1: empty)

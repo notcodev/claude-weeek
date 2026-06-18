@@ -8,13 +8,18 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
  */
 import { z } from 'zod'
 
-import type { WeeekApiClient } from '../../client/weeek-api-client.js'
+import type { WorkspaceRegistry } from '../../workspace-registry.js'
 
 import { toMcpError } from '../../errors.js'
 import { logger } from '../../logger.js'
+import {
+  resolveClient,
+  workspaceParamSchema,
+} from '../workspace-param.js'
 import { jsonContent } from './_helpers.js'
 
 const inputSchema = {
+  ...workspaceParamSchema,
   project_id: z
     .string()
     .min(1)
@@ -25,7 +30,7 @@ const inputSchema = {
 
 export function registerGetProject(
   server: McpServer,
-  client: WeeekApiClient,
+  registry: WorkspaceRegistry,
 ): void {
   server.registerTool(
     'weeek_get_project',
@@ -34,8 +39,9 @@ export function registerGetProject(
         "Get full details of a specific WEEEK project by ID. Use this AFTER weeek_list_projects to drill into a project and see its description, creation date, and settings. Returns the full project object. For listing boards inside the project, use weeek_list_boards with this project's id. The project_id parameter must be obtained from weeek_list_projects (do not guess IDs).",
       inputSchema,
     },
-    async (args: { project_id: string }) => {
+    async (args: { project_id: string; workspace?: string }) => {
       try {
+        const client = resolveClient(registry, args.workspace)
         const raw = await client.get<unknown>(
           `/tm/projects/${encodeURIComponent(args.project_id)}`,
         )

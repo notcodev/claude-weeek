@@ -51,7 +51,9 @@ export class WorkspaceRegistry {
   }
 }
 
-export function createRegistry(config: WeeekConfig): WorkspaceRegistry {
+export function createRegistry(
+  config: WeeekConfig,
+): WorkspaceRegistry {
   const clients = new Map<string, WeeekApiClient>()
   const meta = new Map<string, { baseUrl: string }>()
   for (const [name, ws] of Object.entries(config.workspaces)) {

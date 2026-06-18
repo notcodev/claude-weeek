@@ -72,7 +72,7 @@ describe('toMcpError', () => {
   })
 })
 
-describe('WorkspaceNotFoundError', () => {
+describe('workspaceNotFoundError', () => {
   it('lists available workspaces and points at weeek_list_workspaces', () => {
     const res = toMcpError(
       new WorkspaceNotFoundError('client-x', ['main', 'staging']),

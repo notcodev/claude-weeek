@@ -14,7 +14,6 @@ import { existsSync, readFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import path from 'node:path'
 import process from 'node:process'
-
 import { z } from 'zod'
 
 export const DEFAULT_LIST_LIMIT = 20
@@ -36,9 +35,9 @@ export interface WeeekConfig {
 export interface ConfigSources {
   appData?: string
   env?: NodeJS.ProcessEnv
-  fileExists?: (p: string) => boolean
   homeDir?: string
   platform?: NodeJS.Platform
+  fileExists?: (p: string) => boolean
   readFile?: (p: string) => string
 }
 
@@ -103,7 +102,8 @@ export function parseConfig(
   }
 
   const file = parsed.data
-  const globalDefault = file.baseUrl ?? globalBaseUrlEnv ?? DEFAULT_BASE_URL
+  const globalDefault =
+    file.baseUrl ?? globalBaseUrlEnv ?? DEFAULT_BASE_URL
   const workspaces: Record<string, WorkspaceConfig> = {}
   for (const [name, ws] of Object.entries(file.workspaces)) {
     workspaces[name] = {
@@ -119,7 +119,9 @@ export function parseConfig(
   }
 }
 
-export function resolveConfigPath(sources: ConfigSources = {}): string {
+export function resolveConfigPath(
+  sources: ConfigSources = {},
+): string {
   const env = sources.env ?? process.env
   if (env.WEEEK_CONFIG_PATH && env.WEEEK_CONFIG_PATH.trim() !== '') {
     return env.WEEEK_CONFIG_PATH
@@ -140,7 +142,8 @@ export function resolveConfigPath(sources: ConfigSources = {}): string {
 export function loadConfig(sources: ConfigSources = {}): WeeekConfig {
   const env = sources.env ?? process.env
   const fileExists = sources.fileExists ?? existsSync
-  const readFile = sources.readFile ?? ((p: string) => readFileSync(p, 'utf8'))
+  const readFile =
+    sources.readFile ?? ((p: string) => readFileSync(p, 'utf8'))
   const explicitPath = env.WEEEK_CONFIG_PATH?.trim()
   const configPath = resolveConfigPath(sources)
 

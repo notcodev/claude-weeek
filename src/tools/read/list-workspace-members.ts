@@ -6,10 +6,14 @@
  */
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 
-import type { WeeekApiClient } from '../../client/weeek-api-client.js'
+import type { WorkspaceRegistry } from '../../workspace-registry.js'
 
 import { toMcpError } from '../../errors.js'
 import { logger } from '../../logger.js'
+import {
+  resolveClient,
+  workspaceParamSchema,
+} from '../workspace-param.js'
 import {
   extractArray,
   jsonContent,
@@ -48,11 +52,11 @@ function shapeMember(raw: RawMember): ShapedMember {
   }
 }
 
-const inputSchema = { ...listParamsSchema }
+const inputSchema = { ...listParamsSchema, ...workspaceParamSchema }
 
 export function registerListWorkspaceMembers(
   server: McpServer,
-  client: WeeekApiClient,
+  registry: WorkspaceRegistry,
 ): void {
   server.registerTool(
     'weeek_list_workspace_members',
@@ -61,8 +65,13 @@ export function registerListWorkspaceMembers(
         "List members (users) of the WEEEK workspace. Use this FIRST when an agent needs to resolve a person's name to a user ID — required before filtering tasks by assignee_id in weeek_list_tasks or setting assignee_id on weeek_create_task / weeek_update_task. Returns shaped members with id, name, email, role. Pagination ENFORCED: default 20, max 50 per response. The WEEEK workspace is determined by the API token.",
       inputSchema,
     },
-    async (args: { limit?: number; offset?: number }) => {
+    async (args: {
+      limit?: number
+      offset?: number
+      workspace?: string
+    }) => {
       try {
+        const client = resolveClient(registry, args.workspace)
         const raw = await client.get<unknown>('/ws/members', {
           limit: args.limit,
           offset: args.offset,

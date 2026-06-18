@@ -22,8 +22,12 @@ describe('parseConfig', () => {
       }),
     )
     expect(cfg.defaultWorkspace).toBe('main')
-    expect(cfg.workspaces.main!.baseUrl).toBe('https://main.example/v1')
-    expect(cfg.workspaces.other!.baseUrl).toBe('https://global.example/v1')
+    expect(cfg.workspaces.main!.baseUrl).toBe(
+      'https://main.example/v1',
+    )
+    expect(cfg.workspaces.other!.baseUrl).toBe(
+      'https://global.example/v1',
+    )
   })
 
   it('falls back to DEFAULT_BASE_URL when no baseUrl anywhere', () => {
@@ -44,7 +48,9 @@ describe('parseConfig', () => {
       }),
       'https://env.example/v1',
     )
-    expect(cfg.workspaces.main!.baseUrl).toBe('https://env.example/v1')
+    expect(cfg.workspaces.main!.baseUrl).toBe(
+      'https://env.example/v1',
+    )
   })
 
   it('throws InvalidConfigError when defaultWorkspace is missing from workspaces', () => {
@@ -78,7 +84,10 @@ describe('loadConfig — env fallback (no file)', () => {
   const noFile = { fileExists: () => false }
 
   it('synthesizes a single "default" workspace from WEEEK_API_TOKEN', () => {
-    const cfg = loadConfig({ ...noFile, env: { WEEEK_API_TOKEN: 'tok_123' } })
+    const cfg = loadConfig({
+      ...noFile,
+      env: { WEEEK_API_TOKEN: 'tok_123' },
+    })
     expect(cfg.defaultWorkspace).toBe('default')
     expect(cfg.workspaces.default!.token).toBe('tok_123')
     expect(cfg.workspaces.default!.baseUrl).toBe(DEFAULT_BASE_URL)
@@ -92,14 +101,18 @@ describe('loadConfig — env fallback (no file)', () => {
         WEEEK_API_BASE_URL: 'https://staging.example/v1',
       },
     })
-    expect(cfg.workspaces.default!.baseUrl).toBe('https://staging.example/v1')
+    expect(cfg.workspaces.default!.baseUrl).toBe(
+      'https://staging.example/v1',
+    )
   })
 
   it('throws MissingConfigError when neither file nor token exist', () => {
-    expect(() => loadConfig({ ...noFile, env: {} })).toThrow(MissingConfigError)
+    expect(() => loadConfig({ ...noFile, env: {} })).toThrow(
+      MissingConfigError,
+    )
   })
 
-  it('MissingConfigError mentions setup and never leaks the token', () => {
+  it('missingConfigError mentions setup and never leaks the token', () => {
     try {
       loadConfig({ ...noFile, env: {} })
       expect.fail('should have thrown')
@@ -143,7 +156,9 @@ describe('loadConfig — file path', () => {
 describe('resolveConfigPath', () => {
   it('prefers WEEEK_CONFIG_PATH', () => {
     expect(
-      resolveConfigPath({ env: { WEEEK_CONFIG_PATH: '/custom/c.json' } }),
+      resolveConfigPath({
+        env: { WEEEK_CONFIG_PATH: '/custom/c.json' },
+      }),
     ).toBe('/custom/c.json')
   })
 
@@ -158,7 +173,11 @@ describe('resolveConfigPath', () => {
 
   it('falls back to ~/.config when XDG is unset', () => {
     expect(
-      resolveConfigPath({ env: {}, platform: 'linux', homeDir: '/home/u' }),
+      resolveConfigPath({
+        env: {},
+        platform: 'linux',
+        homeDir: '/home/u',
+      }),
     ).toBe('/home/u/.config/claude-weeek/config.json')
   })
 
@@ -169,6 +188,8 @@ describe('resolveConfigPath', () => {
         platform: 'win32',
         appData: 'C:\\Users\\u\\AppData\\Roaming',
       }),
-    ).toBe('C:\\Users\\u\\AppData\\Roaming\\claude-weeek\\config.json')
+    ).toBe(
+      'C:\\Users\\u\\AppData\\Roaming\\claude-weeek\\config.json',
+    )
   })
 })
