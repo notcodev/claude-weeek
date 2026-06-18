@@ -19,7 +19,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import process from 'node:process'
 
 import { WeeekApiClient } from './client/weeek-api-client.js'
-import { loadConfig, MissingConfigError } from './config.js'
+import { InvalidConfigError, loadConfig, MissingConfigError } from './config.js'
 import { logger } from './logger.js'
 import { registerReadTools } from './tools/read/index.js'
 import { registerWriteTools } from './tools/write/index.js'
@@ -32,17 +32,19 @@ async function main(): Promise<void> {
   try {
     config = loadConfig()
   } catch (err) {
-    if (err instanceof MissingConfigError) {
-      // Write the actionable message to stderr and exit cleanly (non-zero).
-      // Never write to stdout — stdio transport would corrupt the JSON-RPC channel.
+    if (
+      err instanceof MissingConfigError ||
+      err instanceof InvalidConfigError
+    ) {
       logger.error(err.message)
       process.exit(1)
     }
     throw err
   }
 
-  const client = new WeeekApiClient(config.token, {
-    baseUrl: config.baseUrl,
+  const ws = config.workspaces[config.defaultWorkspace]!
+  const client = new WeeekApiClient(ws.token, {
+    baseUrl: ws.baseUrl,
     timeoutMs: config.requestTimeoutMs,
   })
 
