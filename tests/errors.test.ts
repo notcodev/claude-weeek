@@ -4,6 +4,7 @@ import {
   toMcpError,
   WeeekApiError,
   WeeekTimeoutError,
+  WorkspaceNotFoundError,
 } from '../src/errors.js'
 
 describe('toMcpError', () => {
@@ -68,5 +69,17 @@ describe('toMcpError', () => {
     expect(Array.isArray(res.content)).toBe(true)
     expect(res.content[0]?.type).toBe('text')
     expect(typeof res.content[0]?.text).toBe('string')
+  })
+})
+
+describe('WorkspaceNotFoundError', () => {
+  it('lists available workspaces and points at weeek_list_workspaces', () => {
+    const res = toMcpError(
+      new WorkspaceNotFoundError('client-x', ['main', 'staging']),
+    )
+    expect(res.isError).toBe(true)
+    expect(res.content[0]!.text).toContain('client-x')
+    expect(res.content[0]!.text).toContain('main, staging')
+    expect(res.content[0]!.text).toContain('weeek_list_workspaces')
   })
 })

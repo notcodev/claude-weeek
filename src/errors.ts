@@ -31,6 +31,20 @@ export class WeeekTimeoutError extends Error {
   }
 }
 
+export class WorkspaceNotFoundError extends Error {
+  constructor(
+    public readonly requested: string,
+    public readonly available: string[],
+  ) {
+    super(
+      `Workspace "${requested}" is not configured. ` +
+        `Available workspaces: ${available.join(', ')}. ` +
+        'Use weeek_list_workspaces to see configured workspaces.',
+    )
+    this.name = 'WorkspaceNotFoundError'
+  }
+}
+
 /**
  * Maps HTTP status codes to human-readable, actionable messages.
  * Never includes the API token or sensitive request details.
@@ -79,6 +93,12 @@ export function toMcpError(err: unknown): McpErrorResponse {
   } else if (err instanceof WeeekTimeoutError) {
     text = err.message
     logger.error('WeeekTimeoutError', { message: err.message })
+  } else if (err instanceof WorkspaceNotFoundError) {
+    text = err.message
+    logger.error('WorkspaceNotFoundError', {
+      requested: err.requested,
+      available: err.available,
+    })
   } else if (err instanceof Error) {
     text = `Unexpected error: ${err.message}`
     logger.error('UnexpectedError', {
