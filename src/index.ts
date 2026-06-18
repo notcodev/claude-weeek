@@ -32,6 +32,12 @@ const SERVER_NAME = 'claude-weeek'
 const SERVER_VERSION = '0.1.0'
 
 async function main(): Promise<void> {
+  if (process.argv[2] === 'setup') {
+    const { runSetup } = await import('./setup/wizard.js')
+    await runSetup()
+    return
+  }
+
   let config
   try {
     config = loadConfig()
