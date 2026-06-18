@@ -11,7 +11,7 @@ MCP (Model Context Protocol) сервер для интеграции AI-аге�
 - **Tech stack**: TypeScript, MCP SDK (`@modelcontextprotocol/sdk`), npm package
 - **API**: WEEEK Public API v1 — все возможности ограничены тем, что предоставляет API
 - **Transport**: stdio (стандарт для npx MCP серверов)
-- **Auth**: Bearer token через переменную окружения WEEEK_API_TOKEN
+- **Auth**: Two routes — (1) JSON config file (`~/.config/claude-weeek/config.json`, written by `npx claude-weeek setup`) for multi-workspace setups; (2) `WEEEK_API_TOKEN` env var fallback for single-workspace / backward-compatible setups. See `docs/superpowers/specs/2026-06-18-multi-workspace-and-setup-design.md` for the full design.
 
 ## Technology Stack
 

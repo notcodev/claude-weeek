@@ -4,11 +4,11 @@
 
 ## Features
 
-- **11 MCP tools** — 7 read (projects, boards, columns, tasks) + 4 write (create/update/move/complete tasks)
+- **12 MCP tools** — 8 read (projects, boards, columns, tasks, workspaces) + 4 write (create/update/move/complete tasks)
 - **5 skills** — `/weeek-start`, `/weeek-today`, `/weeek-standup`, `/weeek-advance`, `/weeek-context`
 - **2 passive hooks** — auto-detect a WEEEK task ID from the current branch (SessionStart) or commit message (PostToolUse), inject context for the agent without ever calling the API
 - **Read/write split** — tools are grouped so reads can be auto-approved while writes stay gated
-- **Token auth** — single `WEEEK_API_TOKEN` env var, never logged
+- **Multi-workspace** — configure multiple WEEEK workspaces (including self-hosted instances) via `npx claude-weeek setup`; each tool accepts an optional `workspace` argument
 - **Safe defaults** — list tools paginate (default 20, max 50) so responses stay under the 25k token MCP limit
 - **Structured errors** — API failures return `isError: true` with a human-readable message, the server never crashes
 
@@ -18,12 +18,6 @@
 2. Open **Workspace settings → API**.
 3. Generate a personal API token.
 4. Treat it like a password — it grants full read/write access to your workspace. Rotate it if it leaks.
-
-Export it before launching Claude Code so the plugin can read it from the environment:
-
-```bash
-export WEEEK_API_TOKEN="your-weeek-token-here"
-```
 
 ## Installation
 
@@ -45,6 +39,20 @@ In Claude Code, run:
 
 Claude Code will register the MCP server automatically. Restart the session if the tools don't appear immediately.
 
+### 3. Run the setup wizard
+
+```bash
+npx claude-weeek setup
+```
+
+The wizard:
+- Prompts for a workspace name, API token, and base URL (default `https://api.weeek.net/public/v1`).
+- Validates the token against the WEEEK API and shows the workspace title on success.
+- Asks whether to add another workspace (repeat for self-hosted / enterprise instances).
+- When you have more than one workspace, asks which is the default.
+- Writes the config to `~/.config/claude-weeek/config.json` (mode `0600`; respects `$XDG_CONFIG_HOME`; Windows: `%APPDATA%\claude-weeek\config.json`). Override the path with the `WEEEK_CONFIG_PATH` env var.
+- Prints a ready-to-paste MCP server block at the end.
+
 ## Tools
 
 All tools are prefixed `weeek_`. Read tools are side-effect free and safe for auto-approve. Write tools mutate WEEEK state and should prompt for user confirmation.
@@ -53,6 +61,7 @@ All tools are prefixed `weeek_`. Read tools are side-effect free and safe for au
 
 | Tool | Purpose |
 |------|---------|
+| `weeek_list_workspaces` | List configured workspaces (name, base URL, default flag). Never returns tokens. Use to discover workspace names for the `workspace` argument. |
 | `weeek_list_projects` | List projects in the workspace. Use FIRST to discover project IDs. |
 | `weeek_get_project` | Get a single project's full details by ID. |
 | `weeek_list_boards` | List boards inside a project. |
@@ -71,7 +80,36 @@ All tools are prefixed `weeek_`. Read tools are side-effect free and safe for au
 
 ## Configuration
 
-The plugin works out of the box. To customise behaviour for your team's process, drop a `.weeek.json` at the root of your repo. All fields are optional.
+### MCP server config (multi-workspace)
+
+The setup wizard (`npx claude-weeek setup`) writes a JSON config file at `~/.config/claude-weeek/config.json` (or `%APPDATA%\claude-weeek\config.json` on Windows). Override the path with the `WEEEK_CONFIG_PATH` env var.
+
+```jsonc
+{
+  "defaultWorkspace": "main",
+  "baseUrl": "https://api.weeek.net/public/v1",   // optional global default
+  "workspaces": {
+    "main":     { "token": "...", "baseUrl": "https://self-hosted.example/public/v1" },
+    "client-x": { "token": "..." }                 // inherits the global baseUrl
+  }
+}
+```
+
+- **`defaultWorkspace`** — the workspace used when no `workspace` argument is passed to a tool.
+- **`baseUrl`** (top-level) — global fallback base URL. Defaults to `https://api.weeek.net/public/v1`.
+- **`baseUrl`** (per workspace) — overrides the global default. Use this for self-hosted or enterprise WEEEK instances.
+
+Every tool accepts an optional **`workspace`** argument (the key name from `workspaces`). Omit it to use the default. Call `weeek_list_workspaces` to discover the available names.
+
+#### Env var fallback (single workspace, backward compatible)
+
+If no config file exists, the server falls back to the env vars `WEEEK_API_TOKEN` (required) and `WEEEK_API_BASE_URL` (optional), synthesising a workspace named `default`. Existing single-token setups continue to work unchanged.
+
+Resolution precedence: `WEEEK_CONFIG_PATH` → default OS config path → `WEEEK_API_TOKEN` env fallback.
+
+### Repo-level config (`.weeek.json`)
+
+To customise skill and hook behaviour for your team's process, drop a `.weeek.json` at the root of your repo. All fields are optional.
 
 ```json
 {
@@ -161,14 +199,15 @@ Both hooks are silent until they detect a task ID. Errors never surface.
 - **Read/write separation:** read tools and write tools are registered in separate groups. Configure your MCP client to auto-approve reads while gating writes.
 - **No delete operations:** v1 intentionally does not expose delete endpoints — too destructive for an AI agent.
 - **Pagination defaults:** list tools default to 20 results (max 50) to stay under the 25,000 token MCP response cap.
-- **Token handling:** `WEEEK_API_TOKEN` is read from the `env` block only. It is never logged, echoed, or included in error messages.
+- **Token handling:** Tokens are read from the config file (mode `0600`) or the `WEEEK_API_TOKEN` env var. They are never logged, echoed, or included in error messages.
 
 ## Troubleshooting
 
 | Symptom | Fix |
 |---------|-----|
-| `WEEEK_API_TOKEN environment variable is required` | Export the token in the shell that launched Claude Code: `export WEEEK_API_TOKEN=...`. |
+| `WEEEK_API_TOKEN environment variable is required` | No config file found and `WEEEK_API_TOKEN` is not set. Either run `npx claude-weeek setup` to create the config, or export the token: `export WEEEK_API_TOKEN=...`. |
 | `Invalid WEEEK_API_TOKEN` | Token is wrong, revoked, or expired — regenerate in WEEEK workspace settings. |
+| `Workspace "x" not found` | The `workspace` argument doesn't match any key in your config. Call `weeek_list_workspaces` to see available names. |
 | Server disconnects immediately after starting | You are on Node < 20. Upgrade Node (`nvm install 20`) and relaunch Claude Code from the upgraded shell. |
 | Tool returns "Resource not found (404)" | The ID doesn't exist in the workspace — list the parent resource first (e.g., `weeek_list_projects` before `weeek_get_project`). |
 
