@@ -1266,9 +1266,12 @@ function res(status: number, body: unknown) {
 
 describe('validateToken', () => {
   it('returns ok with a workspace name on 200', async () => {
-    const fetchFn = vi.fn(async () => res(200, { workspaces: [{ name: 'Acme' }] }))
+    const fetchFn = vi.fn(async () =>
+      res(200, { success: true, workspace: { id: 1, title: 'Acme' } }),
+    )
     const r = await validateToken('t', 'https://api.weeek.net/public/v1', fetchFn as unknown as typeof fetch)
     expect(r.ok).toBe(true)
+    expect(r.workspaceName).toBe('Acme')
   })
 
   it('returns not-ok on 401', async () => {
@@ -1357,8 +1360,10 @@ Use the endpoint confirmed in Task 0. Default to `/ws` with a `/tm/projects?limi
 /**
  * Token validation for the setup wizard.
  *
- * Task 0 probe result: primary endpoint `<confirmed>`, workspace-name path
- * `<confirmed>`. 401/403 => invalid token; any 2xx => valid.
+ * Task 0 probe result: primary endpoint `GET /ws` returns
+ * `{ success, workspace: { id, title, ... } }` — workspace name is at
+ * `body.workspace.title`. 401/403 => invalid token; any 2xx => valid.
+ * Fallback `GET /tm/projects?limit=1` confirms validity when /ws is absent.
  */
 
 export interface TokenCheck {
@@ -1402,12 +1407,11 @@ export async function validateToken(
 }
 
 function extractWorkspaceName(body: Record<string, unknown>): string | undefined {
-  // Adjust the path to the Task 0 finding.
-  const ws = body.workspaces
-  if (Array.isArray(ws) && ws[0] && typeof ws[0] === 'object') {
-    const first = ws[0] as Record<string, unknown>
-    const name = first.name ?? first.title
-    if (typeof name === 'string') return name
+  // Task 0 confirmed shape: { success, workspace: { id, title, ... } }
+  const ws = body.workspace
+  if (ws && typeof ws === 'object') {
+    const title = (ws as Record<string, unknown>).title
+    if (typeof title === 'string') return title
   }
   return undefined
 }
