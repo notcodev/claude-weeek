@@ -1,3 +1,17 @@
+# [1.1.0](https://github.com/notcodev/claude-weeek/compare/v1.0.0...v1.1.0) (2026-06-26)
+
+
+### Features
+
+* add weeek_list_workspaces tool ([b66528e](https://github.com/notcodev/claude-weeek/commit/b66528ee8dcedfd152337c59167d69a0081a6d69))
+* add WorkspaceNotFoundError and toMcpError mapping ([112ad9e](https://github.com/notcodev/claude-weeek/commit/112ad9e71d6543a3f88692d108ea4594aa43d42b))
+* interactive setup wizard with token validation ([24f1eef](https://github.com/notcodev/claude-weeek/commit/24f1eef28100c036da51703aa439acd1e058ac26))
+* multi-workspace config loader with file + env fallback ([9c37a74](https://github.com/notcodev/claude-weeek/commit/9c37a7481bf42b663820dd521a1df352380950e6))
+* route read tools through WorkspaceRegistry with optional workspace arg ([227283e](https://github.com/notcodev/claude-weeek/commit/227283ea3a71ddb6b932ec009648bc64938b6cd8))
+* route write tools through WorkspaceRegistry with optional workspace arg ([b4b4a8d](https://github.com/notcodev/claude-weeek/commit/b4b4a8dd3cb730d28a18d79b0919cfa6d647f70f))
+* shared workspace param schema and client resolver ([caaf3b5](https://github.com/notcodev/claude-weeek/commit/caaf3b523c1d10ab18c438b7fe48e933335d5e51))
+* WorkspaceRegistry and createRegistry factory ([0568075](https://github.com/notcodev/claude-weeek/commit/0568075020221391043e0fe37ea9b5fa283ed6f6))
+
 # Changelog
 
 All notable changes to `claude-weeek` will be documented in this file.
