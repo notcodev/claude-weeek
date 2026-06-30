@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/notcodev/claude-weeek/compare/v1.1.0...v1.1.1) (2026-06-30)
+
+
+### Bug Fixes
+
+* **tools:** align task write tools with WEEEK API spec ([d3417da](https://github.com/notcodev/claude-weeek/commit/d3417da92e9a38c86d4cc5aca57140b4e9d1b7a3))
+
 # [1.1.0](https://github.com/notcodev/claude-weeek/compare/v1.0.0...v1.1.0) (2026-06-26)
 
 
