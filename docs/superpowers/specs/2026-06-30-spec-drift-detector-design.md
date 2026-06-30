@@ -216,6 +216,7 @@ npm scripts:
 - **Chunk import** — temp `.mjs` + `import(pathToFileURL(...))`. Follow
   transitive chunk imports if present. Assert `schema`/`slugs` exports exist;
   fail loudly on format change.
+- **Loader trust:** `load-spec.ts` dynamically `import()`s a JS chunk downloaded over HTTPS from the hard-coded host `developers.weeek.net`. This runs only in `spec:fetch`/`spec:check:upstream` (maintainer/CI contexts) — `scripts/` is excluded from the npm `files` allowlist, so it never ships to end users. The loader trusts the WEEEK host.
 - **Cycles** — `schema` is already dereferenced via shared object references;
   any structural walk uses a visited set / depth cap to avoid infinite loops.
 - **Base path** — normalize `client.baseUrl` vs `schema.servers[].url` before

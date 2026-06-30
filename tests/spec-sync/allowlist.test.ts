@@ -78,6 +78,10 @@ describe('allowlist data integrity', () => {
     for (const e of allowlist)
       expect(e.reason.length).toBeGreaterThan(0)
   })
+
+  it('contains exactly the 11 verified entries', () => {
+    expect(allowlist).toHaveLength(11)
+  })
 })
 
 describe('partitionFindings', () => {

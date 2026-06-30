@@ -185,6 +185,26 @@ describe('weeek_list_tasks tool', () => {
     expect(query.offset).toBe(20)
   })
 
+  it('converts is_completed: true to completed: 1 in query', async () => {
+    const getFn = vi.fn(async () => ({ tasks: [] }))
+    const client = {
+      get: getFn,
+      post: vi.fn(),
+      put: vi.fn(),
+      patch: vi.fn(),
+    }
+    registerListTasks(fake.server, fakeRegistry(client))
+
+    await fake.getHandler()({
+      is_completed: true,
+      limit: 10,
+    })
+
+    const query = getFn.mock.calls[0]![1] as Record<string, unknown>
+    expect(query.completed).toBe(1)
+    expect(query.perPage).toBe(10)
+  })
+
   it('returns isError:true on WeeekApiError, does not throw', async () => {
     const client = makeFakeClient(async () => {
       throw new WeeekApiError(401, 'unauthorized')
