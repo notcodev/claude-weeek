@@ -42,6 +42,8 @@
     "build": "tsdown",
     "dev": "tsx src/index.ts",
     "start": "node dist/index.js",
+    "spec:fetch": "tsx scripts/spec-sync/fetch-spec.ts",
+    "spec:check:upstream": "tsx scripts/spec-sync/fetch-spec.ts --check-upstream",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
