@@ -10,6 +10,7 @@ import process from 'node:process'
 
 import type { OpenApiDoc } from './types.js'
 
+import { partitionFindings } from './allowlist.js'
 import { captureContract } from './capture-contract.js'
 import { checkAll } from './compare.js'
 import { toolFixtures } from './fixtures.js'
@@ -32,8 +33,24 @@ async function main(): Promise<number> {
   const index = indexOperations(spec)
   const captured = await captureContract(toolFixtures)
   const findings = checkAll(captured, index)
-  process.stdout.write(formatFindings(findings))
-  return hasErrors(findings) ? 1 : 0
+  const { active, accepted } = partitionFindings(findings)
+
+  if (accepted.length > 0) {
+    process.stdout.write(
+      `Accepted (allowlisted) divergences — known WEEEK spec gaps, verified live:\n\n`,
+    )
+    for (const { finding, entry } of accepted) {
+      process.stdout.write(
+        `  [accepted] ${finding.tool} ${finding.method} ${finding.path}\n` +
+          `             ${finding.code}: ${finding.detail}\n` +
+          `             reason: ${entry.reason}\n`,
+      )
+    }
+    process.stdout.write('\n')
+  }
+
+  process.stdout.write(formatFindings(active))
+  return hasErrors(active) ? 1 : 0
 }
 
 main().then(
