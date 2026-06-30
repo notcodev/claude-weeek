@@ -49,6 +49,7 @@
     "typecheck": "tsc --noEmit",
     "typecheck:scripts": "tsc -p tsconfig.scripts.json --noEmit",
     "test": "vitest run",
+    "test:integration": "vitest run --config vitest.integration.config.ts",
     "release:dry": "semantic-release --dry-run --no-ci",
     "prepublishOnly": "pnpm run build"
   },
