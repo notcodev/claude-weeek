@@ -228,6 +228,14 @@ Scripts:
 - `pnpm typecheck` — `tsc --noEmit`
 - `pnpm test` — vitest unit tests
 
+### Keeping in sync with the WEEEK API
+
+The MCP tools are checked against WEEEK's OpenAPI spec automatically.
+Run `pnpm spec:check` to verify the tools match the committed snapshot
+(`spec/weeek-openapi.json`); it prints any "accepted" known spec gaps and fails
+only on new drift. Run `pnpm spec:fetch` to refresh the snapshot from the live
+WEEEK API. See the "Spec-drift detector" section in `CLAUDE.md`.
+
 To smoke-test the built binary:
 
 ```bash

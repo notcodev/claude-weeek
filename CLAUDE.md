@@ -74,6 +74,37 @@ A planned `weeek-log` skill (recording progress as task comments) was dropped af
 
 See `docs/superpowers/specs/2026-04-28-weeek-skills-and-hooks-design.md` for the full design.
 
+## Spec-drift detector
+
+`scripts/spec-sync/` compares what the MCP tools actually send against WEEEK's
+current OpenAPI spec, so request-shape drift (wrong verb, path, body field, or
+query param) is caught automatically instead of via manual live probing.
+
+- **Spec source:** WEEEK's dev portal ships its OpenAPI as a hashed ESM chunk
+  (`weeek.yaml-<hash>.js` exporting `schema`/`slugs`). `load-spec.ts` discovers
+  and imports it. The normalized spec is committed at `spec/weeek-openapi.json`
+  (+ `spec/weeek-openapi.meta.json`).
+- **Code side:** `capture-contract.ts` drives the real tool handlers against a
+  `RecordingClient` (fake server + fake registry) to capture every request.
+- **Allowlist:** `scripts/spec-sync/allowlist.ts` records divergences verified
+  valid against the live API but absent from WEEEK's spec (e.g. `offset`/`perPage`
+  on list endpoints the spec under-documents; `dueDate` on create;
+  `description`/`userId` on update). Allowlisted findings are still PRINTED by
+  `spec:check` (as "accepted") but do not fail the build. Only
+  `query-unknown-param` / `body-unknown-field` can be allowlisted — structural
+  findings (`endpoint-missing`, `body-missing-required`) can never be silenced.
+- **Commands:**
+  - `pnpm spec:fetch` — refresh the committed snapshot from live WEEEK.
+  - `pnpm spec:check` — offline: tools ↔ snapshot. Fails on active (non-allowlisted) drift.
+  - `pnpm spec:check:upstream` — live ↔ snapshot. Detects WEEEK-side changes.
+- **CI** (`.github/workflows/spec-drift.yml`): `spec:check` runs on every PR/push;
+  a nightly job runs `spec:check:upstream` and opens a `spec-drift` issue on change.
+- **Adding a tool:** add a maximal fixture in `scripts/spec-sync/fixtures.ts`.
+  The `fixtures.test.ts` coverage test fails if a registered tool has no fixture.
+- **When the detector flags something:** confirm against the live API. If it's a
+  real tool bug, fix the outgoing field/param name; if WEEEK accepts it but the
+  spec omits it, add a documented `allowlist.ts` entry with the verification reason.
+
 ## Conventions
 
 Conventions not yet established. Will populate as patterns emerge.
