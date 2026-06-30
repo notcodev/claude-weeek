@@ -53,11 +53,9 @@ describe('weeek_complete_task tool', () => {
 
   it('registers under the weeek_complete_task name', () => {
     const client = {
-      get: vi.fn(),
-      post: vi.fn(),
-      put: vi.fn(async () => ({
-        task: { id: 't1', isCompleted: true },
-      })),
+      get: vi.fn(async () => ({ task: { id: 't1' } })),
+      post: vi.fn(async () => ({ success: true })),
+      put: vi.fn(),
       patch: vi.fn(),
     }
     registerCompleteTask(fake.server, fakeRegistry(client))
@@ -78,49 +76,63 @@ describe('weeek_complete_task tool', () => {
     expect(desc).toMatch(/weeek_list_tasks/)
   })
 
-  it('pUTs isCompleted:true by default when completed is not provided', async () => {
-    const putFn = vi.fn(async () => ({
+  it('pOSTs to /tm/tasks/{id}/complete by default', async () => {
+    const postFn = vi.fn(async () => ({ success: true }))
+    const getFn = vi.fn(async () => ({
       task: { id: 't1', isCompleted: true },
     }))
     const client = {
-      get: vi.fn(),
-      post: vi.fn(),
-      put: putFn,
+      get: getFn,
+      post: postFn,
+      put: vi.fn(),
       patch: vi.fn(),
     }
     registerCompleteTask(fake.server, fakeRegistry(client))
 
     await fake.getHandler()({ task_id: 't1' })
 
-    const [path, body] = putFn.mock.calls[0]!
-    expect(path).toBe('/tm/tasks/t1')
-    expect(body).toEqual({ isCompleted: true })
+    expect(postFn).toHaveBeenCalledTimes(1)
+    expect(postFn.mock.calls[0]![0]).toBe('/tm/tasks/t1/complete')
+    // completion is a dedicated endpoint — NOT a PUT with isCompleted
+    expect(getFn).toHaveBeenCalledWith('/tm/tasks/t1')
   })
 
-  it('pUTs isCompleted:false when completed=false to reopen a task', async () => {
-    const putFn = vi.fn(async () => ({
-      task: { id: 't1', isCompleted: false },
-    }))
+  it('pOSTs to /tm/tasks/{id}/un-complete when completed=false', async () => {
+    const postFn = vi.fn(async () => ({ success: true }))
     const client = {
-      get: vi.fn(),
-      post: vi.fn(),
-      put: putFn,
+      get: vi.fn(async () => ({ task: { id: 't1' } })),
+      post: postFn,
+      put: vi.fn(),
       patch: vi.fn(),
     }
     registerCompleteTask(fake.server, fakeRegistry(client))
 
     await fake.getHandler()({ task_id: 't1', completed: false })
-    const body = putFn.mock.calls[0]![1] as Record<string, unknown>
-    expect(body.isCompleted).toBe(false)
+
+    expect(postFn.mock.calls[0]![0]).toBe('/tm/tasks/t1/un-complete')
+  })
+
+  it('never PUTs to /tm/tasks/{id} (that is update, not complete)', async () => {
+    const putFn = vi.fn()
+    const client = {
+      get: vi.fn(async () => ({ task: { id: 't1' } })),
+      post: vi.fn(async () => ({ success: true })),
+      put: putFn,
+      patch: vi.fn(),
+    }
+    registerCompleteTask(fake.server, fakeRegistry(client))
+
+    await fake.getHandler()({ task_id: 't1' })
+    expect(putFn).not.toHaveBeenCalled()
   })
 
   it('returns isError:true on WeeekApiError, does not throw', async () => {
     const client = {
       get: vi.fn(),
-      post: vi.fn(),
-      put: vi.fn(async () => {
+      post: vi.fn(async () => {
         throw new WeeekApiError(404, 'task not found')
       }),
+      put: vi.fn(),
       patch: vi.fn(),
     }
     registerCompleteTask(fake.server, fakeRegistry(client))

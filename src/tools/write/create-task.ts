@@ -50,7 +50,7 @@ const inputSchema = {
     .string()
     .min(1)
     .describe(
-      "Board to place the task on. Optional. Obtain from weeek_list_boards. If omitted, WEEEK assigns to the project's default board.",
+      'Board hint. Optional and informational only — WEEEK derives the board from board_column_id, so pass board_column_id to place the task on a board. Obtain from weeek_list_boards.',
     )
     .optional(),
   board_column_id: z
@@ -106,15 +106,21 @@ export function registerCreateTask(
     }) => {
       try {
         const client = resolveClient(registry, args.workspace)
-        const body: Record<string, unknown> = {
-          title: args.title,
+        // WEEEK create REQUIRES a `locations` array; the task's project and
+        // board column live INSIDE each location entry (POST /tm/tasks). The
+        // board is implied by the column, so there is no top-level boardId.
+        const location: Record<string, unknown> = {
           projectId: args.project_id,
+        }
+        if (args.board_column_id !== undefined)
+          location.boardColumnId = args.board_column_id
+
+        const body: Record<string, unknown> = {
+          locations: [location],
+          title: args.title,
         }
         if (args.description !== undefined)
           body.description = args.description
-        if (args.board_id !== undefined) body.boardId = args.board_id
-        if (args.board_column_id !== undefined)
-          body.boardColumnId = args.board_column_id
         if (args.priority !== undefined) body.priority = args.priority
         if (args.assignee_id !== undefined)
           body.userId = args.assignee_id

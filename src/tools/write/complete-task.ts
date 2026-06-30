@@ -64,11 +64,18 @@ export function registerCompleteTask(
       try {
         const client = resolveClient(registry, args.workspace)
         const completed = args.completed ?? true
-        const body = { isCompleted: completed }
-        const raw = await client.put<unknown>(
-          `/tm/tasks/${encodeURIComponent(args.task_id)}`,
-          body,
-        )
+        const taskPath = `/tm/tasks/${encodeURIComponent(args.task_id)}`
+
+        // Completion in WEEEK is a dedicated endpoint, NOT a task-update field:
+        //   - mark done: POST /tm/tasks/{id}/complete
+        //   - reopen:    POST /tm/tasks/{id}/un-complete
+        // Neither takes a request body.
+        const action = completed ? 'complete' : 'un-complete'
+        await client.post<unknown>(`${taskPath}/${action}`, undefined)
+
+        // The complete endpoints return only { success: true }; re-fetch the
+        // task so the caller gets the updated task object.
+        const raw = await client.get<unknown>(taskPath)
         const task = unwrapTask(raw)
         return jsonContent(task)
       } catch (err) {
