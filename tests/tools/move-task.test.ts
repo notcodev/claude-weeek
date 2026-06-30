@@ -54,9 +54,9 @@ describe('weeek_move_task tool', () => {
 
   it('registers under the weeek_move_task name', () => {
     const client = {
-      get: vi.fn(),
-      post: vi.fn(),
-      put: vi.fn(async () => ({ task: { id: 't1' } })),
+      get: vi.fn(async () => ({ task: { id: 't1' } })),
+      post: vi.fn(async () => ({ success: true })),
+      put: vi.fn(),
       patch: vi.fn(),
     }
     registerMoveTask(fake.server, fakeRegistry(client))
@@ -77,14 +77,15 @@ describe('weeek_move_task tool', () => {
     expect(desc).toMatch(/weeek_complete_task/)
   })
 
-  it('pUTs boardColumnId to /tm/tasks/{id} without boardId when not provided', async () => {
-    const putFn = vi.fn(async () => ({
+  it('pOSTs boardColumnId to /tm/tasks/{id}/board-column when no board_id', async () => {
+    const postFn = vi.fn(async () => ({ success: true }))
+    const getFn = vi.fn(async () => ({
       task: { id: 't1', boardColumnId: 'col-2' },
     }))
     const client = {
-      get: vi.fn(),
-      post: vi.fn(),
-      put: putFn,
+      get: getFn,
+      post: postFn,
+      put: vi.fn(),
       patch: vi.fn(),
     }
     registerMoveTask(fake.server, fakeRegistry(client))
@@ -94,18 +95,22 @@ describe('weeek_move_task tool', () => {
       board_column_id: 'col-2',
     })
 
-    const [path, body] = putFn.mock.calls[0]!
-    expect(path).toBe('/tm/tasks/t1')
+    // single column move → one POST to the board-column endpoint, no /board
+    expect(postFn).toHaveBeenCalledTimes(1)
+    const [path, body] = postFn.mock.calls[0]!
+    expect(path).toBe('/tm/tasks/t1/board-column')
     expect(body).toEqual({ boardColumnId: 'col-2' })
-    expect((body as Record<string, unknown>).boardId).toBeUndefined()
+    // returns the refreshed task via a follow-up GET
+    expect(getFn).toHaveBeenCalledWith('/tm/tasks/t1')
   })
 
-  it('includes boardId in the body when moving across boards', async () => {
-    const putFn = vi.fn(async () => ({ task: { id: 't1' } }))
+  it('pOSTs to /board then /board-column when moving across boards', async () => {
+    const postFn = vi.fn(async () => ({ success: true }))
+    const getFn = vi.fn(async () => ({ task: { id: 't1' } }))
     const client = {
-      get: vi.fn(),
-      post: vi.fn(),
-      put: putFn,
+      get: getFn,
+      post: postFn,
+      put: vi.fn(),
       patch: vi.fn(),
     }
     registerMoveTask(fake.server, fakeRegistry(client))
@@ -115,18 +120,24 @@ describe('weeek_move_task tool', () => {
       board_column_id: 'col-3',
       board_id: 'board-B',
     })
-    const body = putFn.mock.calls[0]![1] as Record<string, unknown>
-    expect(body.boardColumnId).toBe('col-3')
-    expect(body.boardId).toBe('board-B')
+
+    expect(postFn).toHaveBeenCalledTimes(2)
+    // board change first, then column placement
+    expect(postFn.mock.calls[0]![0]).toBe('/tm/tasks/t1/board')
+    expect(postFn.mock.calls[0]![1]).toEqual({ boardId: 'board-B' })
+    expect(postFn.mock.calls[1]![0]).toBe('/tm/tasks/t1/board-column')
+    expect(postFn.mock.calls[1]![1]).toEqual({
+      boardColumnId: 'col-3',
+    })
   })
 
   it('returns isError:true on WeeekApiError, does not throw', async () => {
     const client = {
       get: vi.fn(),
-      post: vi.fn(),
-      put: vi.fn(async () => {
+      post: vi.fn(async () => {
         throw new WeeekApiError(404, 'task not found')
       }),
+      put: vi.fn(),
       patch: vi.fn(),
     }
     registerMoveTask(fake.server, fakeRegistry(client))

@@ -71,15 +71,24 @@ export function registerMoveTask(
     }) => {
       try {
         const client = resolveClient(registry, args.workspace)
-        const body: Record<string, unknown> = {
-          boardColumnId: args.board_column_id,
-        }
-        if (args.board_id !== undefined) body.boardId = args.board_id
+        const taskPath = `/tm/tasks/${encodeURIComponent(args.task_id)}`
 
-        const raw = await client.put<unknown>(
-          `/tm/tasks/${encodeURIComponent(args.task_id)}`,
-          body,
-        )
+        // Moving in WEEEK uses dedicated endpoints, NOT a task update:
+        //   - cross-board move: POST /tm/tasks/{id}/board       { boardId }
+        //   - column placement: POST /tm/tasks/{id}/board-column { boardColumnId }
+        // When changing boards, set the board first, then the column.
+        if (args.board_id !== undefined) {
+          await client.post<unknown>(`${taskPath}/board`, {
+            boardId: args.board_id,
+          })
+        }
+        await client.post<unknown>(`${taskPath}/board-column`, {
+          boardColumnId: args.board_column_id,
+        })
+
+        // The move endpoints return only { success: true }; re-fetch the task
+        // so the caller gets the updated task object (matches the tool's docs).
+        const raw = await client.get<unknown>(taskPath)
         const task = unwrapTask(raw)
         return jsonContent(task)
       } catch (err) {

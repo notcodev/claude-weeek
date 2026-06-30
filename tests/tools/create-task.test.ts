@@ -83,7 +83,7 @@ describe('weeek_create_task tool', () => {
     expect(desc).toMatch(/weeek_update_task/)
   })
 
-  it('pOSTs to /tm/tasks with camelCase body fields', async () => {
+  it('pOSTs to /tm/tasks with a locations[] array (WEEEK spec)', async () => {
     const postFn = vi.fn(async () => ({ task: { id: 't1' } }))
     const client = {
       get: vi.fn(),
@@ -107,20 +107,25 @@ describe('weeek_create_task tool', () => {
     expect(postFn).toHaveBeenCalledTimes(1)
     const [path, body] = postFn.mock.calls[0]!
     expect(path).toBe('/tm/tasks')
-    // WEEEK uses userId (not assigneeId) and dateEnd (not dueDate)
+    // WEEEK create REQUIRES a locations[] array; project + column live INSIDE
+    // each location (POST /tm/tasks docs). userId (not assigneeId), dateEnd.
     expect(body).toEqual({
+      locations: [{ projectId: 'p1', boardColumnId: 'col1' }],
       title: 'Ship it',
-      projectId: 'p1',
       description: 'body text',
-      boardId: 'b1',
-      boardColumnId: 'col1',
       priority: 3,
       userId: 'u1',
       dateEnd: '2026-05-01',
     })
+    // board_id is NOT a WEEEK create field — the column determines the board.
+    expect('boardId' in (body as Record<string, unknown>)).toBe(false)
+    expect(
+      (body as { locations: Array<Record<string, unknown>> })
+        .locations[0],
+    ).not.toHaveProperty('boardId')
   })
 
-  it('omits optional fields when not provided', async () => {
+  it('omits optional fields, still sends a locations[] with projectId', async () => {
     const postFn = vi.fn(async () => ({ task: { id: 't1' } }))
     const client = {
       get: vi.fn(),
@@ -132,11 +137,18 @@ describe('weeek_create_task tool', () => {
 
     await fake.handler()({ title: 'minimal', project_id: 'p1' })
     const body = postFn.mock.calls[0]![1] as Record<string, unknown>
-    expect(body).toEqual({ title: 'minimal', projectId: 'p1' })
+    expect(body).toEqual({
+      locations: [{ projectId: 'p1' }],
+      title: 'minimal',
+    })
     expect('description' in body).toBe(false)
-    expect('boardId' in body).toBe(false)
     expect('dateEnd' in body).toBe(false)
     expect('userId' in body).toBe(false)
+    // no boardColumnId inside the location when none provided
+    expect(
+      (body as { locations: Array<Record<string, unknown>> })
+        .locations[0],
+    ).not.toHaveProperty('boardColumnId')
   })
 
   it('unwraps the {task: ...} envelope in the response', async () => {
