@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { RecordingClient } from '../../scripts/spec-sync/recording-client.js'
 
-describe('RecordingClient', () => {
+describe('recordingClient', () => {
   it('records GET with query and returns a safe stub', async () => {
     const c = new RecordingClient()
     const res = await c.get('/tm/tasks', { limit: 50 })

@@ -33,7 +33,8 @@ describe('isAllowed', () => {
           code: 'body-unknown-field',
           method: 'POST',
           path: '/tm/tasks',
-          detail: 'body field "dueDate" is not declared in the requestBody schema',
+          detail:
+            'body field "dueDate" is not declared in the requestBody schema',
         }),
       )?.name,
     ).toBe('dueDate')
@@ -45,7 +46,8 @@ describe('isAllowed', () => {
         finding({
           tool: 'weeek_create_task',
           code: 'body-unknown-field',
-          detail: 'body field "bogus" is not declared in the requestBody schema',
+          detail:
+            'body field "bogus" is not declared in the requestBody schema',
         }),
       ),
     ).toBeNull()
@@ -54,7 +56,10 @@ describe('isAllowed', () => {
   it('does NOT allowlist a structural finding (endpoint-missing) even on an allowlisted tool', () => {
     expect(
       isAllowed(
-        finding({ code: 'endpoint-missing', detail: 'no GET operation matches path "/tm/projects"' }),
+        finding({
+          code: 'endpoint-missing',
+          detail: 'no GET operation matches path "/tm/projects"',
+        }),
       ),
     ).toBeNull()
   })
@@ -63,12 +68,15 @@ describe('isAllowed', () => {
 describe('allowlist data integrity', () => {
   it('only ever allowlists query-unknown-param or body-unknown-field', () => {
     for (const e of allowlist) {
-      expect(['query-unknown-param', 'body-unknown-field']).toContain(e.code)
+      expect(['query-unknown-param', 'body-unknown-field']).toContain(
+        e.code,
+      )
     }
   })
 
   it('every entry has a non-empty reason', () => {
-    for (const e of allowlist) expect(e.reason.length).toBeGreaterThan(0)
+    for (const e of allowlist)
+      expect(e.reason.length).toBeGreaterThan(0)
   })
 })
 

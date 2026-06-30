@@ -16,7 +16,9 @@ describe('captureContract', () => {
       (r) => r.tool === 'weeek_create_task' && r.method === 'POST',
     )
     expect(create?.path).toBe('/tm/tasks')
-    const body = create?.body as { locations: { projectId: string }[] }
+    const body = create?.body as {
+      locations: { projectId: string }[]
+    }
     expect(body.locations[0]?.projectId).toBe('PID')
   })
 
@@ -45,6 +47,8 @@ describe('captureContract', () => {
   })
 
   it('emits no API calls for list_workspaces', () => {
-    expect(reqs.filter((r) => r.tool === 'weeek_list_workspaces')).toHaveLength(0)
+    expect(
+      reqs.filter((r) => r.tool === 'weeek_list_workspaces'),
+    ).toHaveLength(0)
   })
 })

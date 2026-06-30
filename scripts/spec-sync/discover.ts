@@ -8,13 +8,16 @@ export function parseEntryUrl(html: string): string {
 
 export function parseYamlChunkRef(entryJs: string): string {
   const m = entryJs.match(
-    /["'`](\.?\/?(?:assets\/)?weeek\.yaml-[A-Za-z0-9_-]+\.js)["'`]/,
+    /["'`](\.?\/?(?:assets\/)?weeek\.yaml-[\w-]+\.js)["'`]/,
   )
-  if (!m?.[1]) throw new Error('weeek.yaml chunk reference not found in entry bundle')
+  if (!m?.[1])
+    throw new Error(
+      'weeek.yaml chunk reference not found in entry bundle',
+    )
   return m[1]
 }
 
 export function chunkHashFromName(name: string): string {
-  const m = name.match(/weeek\.yaml-([A-Za-z0-9_-]+)\.js/)
+  const m = name.match(/weeek\.yaml-([\w-]+)\.js/)
   return m?.[1] ?? ''
 }

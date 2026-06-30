@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import { loadSpec, resolveChunkUrl } from '../../scripts/spec-sync/load-spec.js'
+import {
+  loadSpec,
+  resolveChunkUrl,
+} from '../../scripts/spec-sync/load-spec.js'
 
 describe('live WEEEK spec loading (network)', () => {
   it('resolves a weeek.yaml chunk URL', async () => {

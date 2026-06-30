@@ -10,10 +10,14 @@ describe('parseEntryUrl', () => {
   it('extracts the entry.client module src', () => {
     const html =
       '<script type="module" crossorigin src="/assets/entry.client-Dm62IRDB.js"></script>'
-    expect(parseEntryUrl(html)).toBe('/assets/entry.client-Dm62IRDB.js')
+    expect(parseEntryUrl(html)).toBe(
+      '/assets/entry.client-Dm62IRDB.js',
+    )
   })
   it('throws when no entry chunk is present', () => {
-    expect(() => parseEntryUrl('<html></html>')).toThrow(/entry chunk/i)
+    expect(() => parseEntryUrl('<html></html>')).toThrow(
+      /entry chunk/i,
+    )
   })
 })
 
@@ -23,12 +27,16 @@ describe('parseYamlChunkRef', () => {
     expect(parseYamlChunkRef(js)).toBe('./weeek.yaml-zrWBOv8I.js')
   })
   it('throws when the chunk reference is missing', () => {
-    expect(() => parseYamlChunkRef('const x = 1')).toThrow(/weeek\.yaml/i)
+    expect(() => parseYamlChunkRef('const x = 1')).toThrow(
+      /weeek\.yaml/i,
+    )
   })
 })
 
 describe('chunkHashFromName', () => {
   it('pulls the hash out of the filename', () => {
-    expect(chunkHashFromName('/assets/weeek.yaml-zrWBOv8I.js')).toBe('zrWBOv8I')
+    expect(chunkHashFromName('/assets/weeek.yaml-zrWBOv8I.js')).toBe(
+      'zrWBOv8I',
+    )
   })
 })

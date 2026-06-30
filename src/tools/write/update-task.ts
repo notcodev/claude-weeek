@@ -66,7 +66,7 @@ const inputSchema = {
   date_end: z
     .string()
     .describe(
-      "New due date in ISO 8601. Optional. Omit to leave unchanged.",
+      'New due date in ISO 8601. Optional. Omit to leave unchanged.',
     )
     .optional(),
 }

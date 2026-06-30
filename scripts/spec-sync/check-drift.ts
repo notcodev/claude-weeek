@@ -58,7 +58,9 @@ main().then(
     process.exitCode = code
   },
   (err: unknown) => {
-    process.stderr.write(`spec:check failed: ${(err as Error).message}\n`)
+    process.stderr.write(
+      `spec:check failed: ${(err as Error).message}\n`,
+    )
     process.exitCode = 1
   },
 )

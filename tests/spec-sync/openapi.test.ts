@@ -35,7 +35,9 @@ describe('pathTemplateToRegex', () => {
 
   it('rejects a different segment count', () => {
     expect(
-      pathTemplateToRegex('/tm/tasks/{id}').test('/tm/tasks/TID/board'),
+      pathTemplateToRegex('/tm/tasks/{id}').test(
+        '/tm/tasks/TID/board',
+      ),
     ).toBe(false)
   })
 })
@@ -45,7 +47,8 @@ describe('indexOperations + matchOperation', () => {
 
   it('matches POST /tm/tasks/{id}/board-column', () => {
     expect(
-      matchOperation(idx, 'POST', '/tm/tasks/TID/board-column')?.template,
+      matchOperation(idx, 'POST', '/tm/tasks/TID/board-column')
+        ?.template,
     ).toBe('/tm/tasks/{id}/board-column')
   })
 
@@ -54,7 +57,9 @@ describe('indexOperations + matchOperation', () => {
   })
 
   it('prefers the literal /tm/tasks over a templated match', () => {
-    expect(matchOperation(idx, 'GET', '/tm/tasks')?.template).toBe('/tm/tasks')
+    expect(matchOperation(idx, 'GET', '/tm/tasks')?.template).toBe(
+      '/tm/tasks',
+    )
   })
 
   it('strips the server base path from spec path keys', () => {
@@ -63,7 +68,8 @@ describe('indexOperations + matchOperation', () => {
       paths: { '/public/v1/tm/tasks': { get: {} } },
     }
     expect(
-      matchOperation(indexOperations(withBase), 'GET', '/tm/tasks')?.template,
+      matchOperation(indexOperations(withBase), 'GET', '/tm/tasks')
+        ?.template,
     ).toBe('/tm/tasks')
   })
 })

@@ -165,7 +165,12 @@ export function registerListTasks(
           boardId: args.board_id,
           boardColumnId: args.column_id,
           userId: args.assignee_id,
-          completed: args.is_completed === undefined ? undefined : args.is_completed ? 1 : 0,
+          completed:
+            args.is_completed === undefined
+              ? undefined
+              : args.is_completed
+                ? 1
+                : 0,
           perPage: args.limit,
           offset: args.offset,
         })

@@ -77,7 +77,7 @@ const inputSchema = {
   date_end: z
     .string()
     .describe(
-      "Due date in ISO 8601 format (e.g. 2026-04-15 or 2026-04-15T12:00:00Z). Optional.",
+      'Due date in ISO 8601 format (e.g. 2026-04-15 or 2026-04-15T12:00:00Z). Optional.',
     )
     .optional(),
 }

@@ -19,7 +19,9 @@ function isPlainObject(v: unknown): v is Record<string, unknown> {
 }
 
 /** Query keys the client would actually send (it drops undefined/null). */
-function definedQueryKeys(query: Record<string, unknown> | undefined): string[] {
+function definedQueryKeys(
+  query: Record<string, unknown> | undefined,
+): string[] {
   if (!query) return []
   return Object.entries(query)
     .filter(([, v]) => v !== undefined && v !== null)
@@ -86,8 +88,14 @@ export function compareRequest(
 
     for (const [key, val] of Object.entries(body)) {
       const propSchema = props[key]
-      if (propSchema?.type === 'array' && propSchema.items && Array.isArray(val)) {
-        findings.push(...checkNestedArray(req, key, propSchema.items, val))
+      if (
+        propSchema?.type === 'array' &&
+        propSchema.items &&
+        Array.isArray(val)
+      ) {
+        findings.push(
+          ...checkNestedArray(req, key, propSchema.items, val),
+        )
       }
     }
   }

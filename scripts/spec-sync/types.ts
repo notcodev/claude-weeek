@@ -4,11 +4,11 @@ export type HttpMethod = 'GET' | 'PATCH' | 'POST' | 'PUT'
 
 /** A single HTTP request the code emits, captured at runtime. */
 export interface CapturedRequest {
-  tool: string
+  body?: unknown
   method: HttpMethod
   path: string
   query?: Record<string, unknown>
-  body?: unknown
+  tool: string
 }
 
 export type Severity = 'error' | 'warn'
@@ -22,49 +22,49 @@ export type FindingCode =
   | 'query-unknown-param'
 
 export interface Finding {
-  severity: Severity
   code: FindingCode
-  tool: string
+  detail: string
   method: HttpMethod
   path: string
-  detail: string
+  severity: Severity
+  tool: string
 }
 
 /** Minimal OpenAPI shapes — only the parts the matcher touches. */
 export interface OpenApiSchemaObject {
-  type?: string
+  additionalProperties?: boolean | OpenApiSchemaObject
+  items?: OpenApiSchemaObject
   properties?: Record<string, OpenApiSchemaObject>
   required?: string[]
-  items?: OpenApiSchemaObject
-  additionalProperties?: boolean | OpenApiSchemaObject
+  type?: string
   [k: string]: unknown
 }
 
 export interface OpenApiParameter {
-  name: string
   in: string
+  name: string
   required?: boolean
 }
 
 export interface OpenApiOperation {
+  parameters?: OpenApiParameter[]
   requestBody?: {
     required?: boolean
     content?: Record<string, { schema?: OpenApiSchemaObject }>
   }
-  parameters?: OpenApiParameter[]
   [k: string]: unknown
 }
 
 export interface OpenApiDoc {
   openapi?: string
-  servers?: { url: string }[]
   paths: Record<string, Record<string, OpenApiOperation>>
+  servers?: { url: string }[]
 }
 
 export interface IndexedOperation {
-  template: string
   method: string
-  regex: RegExp
-  paramCount: number
   op: OpenApiOperation
+  paramCount: number
+  regex: RegExp
+  template: string
 }

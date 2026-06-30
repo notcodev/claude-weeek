@@ -16,8 +16,8 @@ import { registerWriteTools } from '../../src/tools/write/index.js'
 import { RecordingClient } from './recording-client.js'
 
 interface RegisteredTool {
-  name: string
   inputSchema: Record<string, unknown>
+  name: string
   handler: (args: Record<string, unknown>) => Promise<unknown>
 }
 
@@ -30,7 +30,11 @@ function collectTools(registry: WorkspaceRegistry): RegisteredTool[] {
       def: { inputSchema?: Record<string, unknown> },
       handler: RegisteredTool['handler'],
     ) => {
-      tools.push({ name, inputSchema: def.inputSchema ?? {}, handler })
+      tools.push({
+        name,
+        inputSchema: def.inputSchema ?? {},
+        handler,
+      })
     },
   } as unknown as McpServer
   registerReadTools(server, registry)
@@ -73,7 +77,8 @@ export async function captureContract(
     for (const args of argSets) {
       current = new RecordingClient()
       await tool.handler(args)
-      for (const rec of current.records) out.push({ tool: tool.name, ...rec })
+      for (const rec of current.records)
+        out.push({ tool: tool.name, ...rec })
     }
   }
   return out

@@ -49,15 +49,21 @@ export async function loadSpec(): Promise<{
 
   // Defensive: download any sibling chunks this module imports relatively.
   const siblings = new Set(
-    [...src.matchAll(/["'`]\.\/([A-Za-z0-9._-]+\.js)["'`]/g)]
+    [...src.matchAll(/["'`]\.\/([\w.\-]+\.js)["'`]/g)]
       .map((m) => m[1])
       .filter((n): n is string => Boolean(n) && n !== fileName),
   )
   for (const name of siblings) {
-    await writeFile(path.join(dir, name), await getText(`${baseUrl}${name}`), 'utf8')
+    await writeFile(
+      path.join(dir, name),
+      await getText(`${baseUrl}${name}`),
+      'utf8',
+    )
   }
 
-  const mod = (await import(pathToFileURL(path.join(dir, fileName)).href)) as {
+  const mod = (await import(
+    pathToFileURL(path.join(dir, fileName)).href
+  )) as {
     schema?: OpenApiDoc
     slugs?: unknown
   }

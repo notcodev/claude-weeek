@@ -9,10 +9,10 @@
 import type { Finding } from './types.js'
 
 export interface AllowEntry {
-  tool: string
   code: 'body-unknown-field' | 'query-unknown-param'
   name: string // the param/field the finding is about
   reason: string
+  tool: string
 }
 
 const PAGINATION_TOOLS = [
@@ -50,13 +50,15 @@ export const allowlist: AllowEntry[] = [
     tool: 'weeek_update_task',
     code: 'body-unknown-field',
     name: 'description',
-    reason: 'verified accepted on PUT /tm/tasks/{id}; PUT schema incomplete',
+    reason:
+      'verified accepted on PUT /tm/tasks/{id}; PUT schema incomplete',
   },
   {
     tool: 'weeek_update_task',
     code: 'body-unknown-field',
     name: 'userId',
-    reason: 'verified accepted on PUT /tm/tasks/{id}; PUT schema incomplete',
+    reason:
+      'verified accepted on PUT /tm/tasks/{id}; PUT schema incomplete',
   },
 ]
 

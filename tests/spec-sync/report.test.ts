@@ -2,7 +2,10 @@ import { describe, expect, it } from 'vitest'
 
 import type { Finding } from '../../scripts/spec-sync/types.js'
 
-import { formatFindings, hasErrors } from '../../scripts/spec-sync/report.js'
+import {
+  formatFindings,
+  hasErrors,
+} from '../../scripts/spec-sync/report.js'
 
 const err: Finding = {
   severity: 'error',

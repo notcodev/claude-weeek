@@ -31,21 +31,26 @@ export function specBasePath(spec: OpenApiDoc): string {
 }
 
 function stripBase(path: string, base: string): string {
-  if (base && path.startsWith(base)) return path.slice(base.length) || '/'
+  if (base && path.startsWith(base))
+    return path.slice(base.length) || '/'
   return path
 }
 
 /** Convert an OpenAPI path template into a full-match regex; {param} → one segment. */
 export function pathTemplateToRegex(template: string): RegExp {
-  const parts = template.split('/').map((seg) =>
-    /^\{.+\}$/.test(seg)
-      ? '[^/]+'
-      : seg.replace(/[$()*+.?[\\\]^{|}]/g, '\\$&'),
-  )
+  const parts = template
+    .split('/')
+    .map((seg) =>
+      /^\{.+\}$/.test(seg)
+        ? '[^/]+'
+        : seg.replace(/[$()*+.?[\\\]^{|}]/g, '\\$&'),
+    )
   return new RegExp(`^${parts.join('/')}$`)
 }
 
-export function indexOperations(spec: OpenApiDoc): IndexedOperation[] {
+export function indexOperations(
+  spec: OpenApiDoc,
+): IndexedOperation[] {
   const base = specBasePath(spec)
   const out: IndexedOperation[] = []
   for (const [rawPath, methods] of Object.entries(spec.paths ?? {})) {
@@ -53,7 +58,11 @@ export function indexOperations(spec: OpenApiDoc): IndexedOperation[] {
     const paramCount = (template.match(/\{[^}]+\}/g) ?? []).length
     const regex = pathTemplateToRegex(template)
     for (const [method, op] of Object.entries(methods ?? {})) {
-      if ((HTTP_METHODS as readonly string[]).includes(method.toLowerCase())) {
+      if (
+        (HTTP_METHODS as readonly string[]).includes(
+          method.toLowerCase(),
+        )
+      ) {
         out.push({
           template,
           method: method.toLowerCase(),
@@ -90,6 +99,8 @@ export function requestBodyRequired(op: OpenApiOperation): boolean {
   return op.requestBody?.required === true
 }
 
-export function queryParams(op: OpenApiOperation): OpenApiParameter[] {
+export function queryParams(
+  op: OpenApiOperation,
+): OpenApiParameter[] {
   return (op.parameters ?? []).filter((p) => p.in === 'query')
 }

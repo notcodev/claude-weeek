@@ -17,10 +17,10 @@ const SNAPSHOT = path.join('spec', 'weeek-openapi.json')
 const META = path.join('spec', 'weeek-openapi.meta.json')
 
 interface SnapshotMeta {
-  sourceUrl: string
   chunkHash: string
   fetchedAt: string
   openapiVersion?: string
+  sourceUrl: string
 }
 
 function out(msg: string): void {
@@ -32,7 +32,12 @@ function changedPaths(a: OpenApiDoc, b: OpenApiDoc): string[] {
   const sig = (s: OpenApiDoc): Map<string, string> => {
     const m = new Map<string, string>()
     for (const [p, methods] of Object.entries(s.paths ?? {})) {
-      m.set(p, Object.keys(methods ?? {}).sort().join(','))
+      m.set(
+        p,
+        Object.keys(methods ?? {})
+          .sort()
+          .join(','),
+      )
     }
     return m
   }
@@ -50,14 +55,22 @@ async function main(): Promise<number> {
 
   if (!checkUpstream) {
     await mkdir('spec', { recursive: true })
-    await writeFile(SNAPSHOT, `${JSON.stringify(schema, null, 2)}\n`, 'utf8')
+    await writeFile(
+      SNAPSHOT,
+      `${JSON.stringify(schema, null, 2)}\n`,
+      'utf8',
+    )
     const meta: SnapshotMeta = {
       sourceUrl: chunkUrl,
       chunkHash,
       fetchedAt: new Date().toISOString(),
       openapiVersion: schema.openapi,
     }
-    await writeFile(META, `${JSON.stringify(meta, null, 2)}\n`, 'utf8')
+    await writeFile(
+      META,
+      `${JSON.stringify(meta, null, 2)}\n`,
+      'utf8',
+    )
     out(`✓ Snapshot written: ${SNAPSHOT} (chunk ${chunkHash})`)
     return 0
   }
@@ -65,25 +78,37 @@ async function main(): Promise<number> {
   // --check-upstream: cheap hash short-circuit, then deep path diff.
   let committedMeta: SnapshotMeta
   try {
-    committedMeta = JSON.parse(await readFile(META, 'utf8')) as SnapshotMeta
+    committedMeta = JSON.parse(
+      await readFile(META, 'utf8'),
+    ) as SnapshotMeta
   } catch {
-    out(`✗ No committed snapshot found at ${META}. Run \`pnpm spec:fetch\` first.`)
+    out(
+      `✗ No committed snapshot found at ${META}. Run \`pnpm spec:fetch\` first.`,
+    )
     return 1
   }
   if (committedMeta.chunkHash === chunkHash) {
     out(`✓ WEEEK spec unchanged upstream (chunk ${chunkHash}).`)
     return 0
   }
-  const committed = JSON.parse(await readFile(SNAPSHOT, 'utf8')) as OpenApiDoc
+  const committed = JSON.parse(
+    await readFile(SNAPSHOT, 'utf8'),
+  ) as OpenApiDoc
   const changed = changedPaths(committed, schema)
-  out(`✗ WEEEK spec changed upstream: chunk ${committedMeta.chunkHash} → ${chunkHash}`)
+  out(
+    `✗ WEEEK spec changed upstream: chunk ${committedMeta.chunkHash} → ${chunkHash}`,
+  )
   if (changed.length > 0) {
     out('Changed paths:')
     for (const p of changed) out(`  - ${p}`)
   } else {
-    out('(no path-set changes; schema bodies/params differ — run `pnpm spec:fetch` and diff)')
+    out(
+      '(no path-set changes; schema bodies/params differ — run `pnpm spec:fetch` and diff)',
+    )
   }
-  out('Run `pnpm spec:fetch`, review the diff, reconcile the tools, and commit the refreshed snapshot.')
+  out(
+    'Run `pnpm spec:fetch`, review the diff, reconcile the tools, and commit the refreshed snapshot.',
+  )
   return 1
 }
 
@@ -92,7 +117,9 @@ main().then(
     process.exitCode = code
   },
   (err: unknown) => {
-    process.stderr.write(`spec:fetch failed: ${(err as Error).message}\n`)
+    process.stderr.write(
+      `spec:fetch failed: ${(err as Error).message}\n`,
+    )
     process.exitCode = 1
   },
 )

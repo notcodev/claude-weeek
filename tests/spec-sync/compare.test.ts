@@ -5,7 +5,10 @@ import type {
   OpenApiDoc,
 } from '../../scripts/spec-sync/types.js'
 
-import { checkAll, compareRequest } from '../../scripts/spec-sync/compare.js'
+import {
+  checkAll,
+  compareRequest,
+} from '../../scripts/spec-sync/compare.js'
 import { indexOperations } from '../../scripts/spec-sync/openapi.js'
 
 const spec: OpenApiDoc = {
@@ -58,7 +61,11 @@ function req(partial: Partial<CapturedRequest>): CapturedRequest {
 describe('compareRequest', () => {
   it('flags endpoint-missing for an undefined verb/path', () => {
     const f = compareRequest(
-      req({ method: 'PUT', path: '/tm/tasks/TID/board-column', body: {} }),
+      req({
+        method: 'PUT',
+        path: '/tm/tasks/TID/board-column',
+        body: {},
+      }),
       index,
     )
     expect(f).toHaveLength(1)
@@ -67,7 +74,13 @@ describe('compareRequest', () => {
 
   it('flags body-unknown-field', () => {
     const f = compareRequest(
-      req({ body: { title: 'x', locations: [{ projectId: 'p' }], bogus: 1 } }),
+      req({
+        body: {
+          title: 'x',
+          locations: [{ projectId: 'p' }],
+          bogus: 1,
+        },
+      }),
       index,
     )
     expect(f.map((x) => x.code)).toContain('body-unknown-field')
@@ -88,7 +101,9 @@ describe('compareRequest', () => {
 
   it('flags nested-mismatch when an array item lacks a required field', () => {
     const f = compareRequest(
-      req({ body: { title: 'x', locations: [{ boardColumnId: 'c' }] } }),
+      req({
+        body: { title: 'x', locations: [{ boardColumnId: 'c' }] },
+      }),
       index,
     )
     expect(f.map((x) => x.code)).toContain('nested-mismatch')
@@ -96,7 +111,10 @@ describe('compareRequest', () => {
 
   it('flags query-unknown-param', () => {
     const f = compareRequest(
-      req({ method: 'GET', query: { projectId: 'p', limit: 50, bad: 1 } }),
+      req({
+        method: 'GET',
+        query: { projectId: 'p', limit: 50, bad: 1 },
+      }),
       index,
     )
     expect(f.map((x) => x.code)).toContain('query-unknown-param')
@@ -112,7 +130,10 @@ describe('compareRequest', () => {
 
   it('ignores undefined/null query values', () => {
     const f = compareRequest(
-      req({ method: 'GET', query: { projectId: 'p', limit: 50, bad: undefined } }),
+      req({
+        method: 'GET',
+        query: { projectId: 'p', limit: 50, bad: undefined },
+      }),
       index,
     )
     expect(f).toHaveLength(0)
@@ -124,7 +145,9 @@ describe('checkAll', () => {
     const findings = checkAll(
       [
         req({ method: 'PUT', path: '/nope', body: {} }),
-        req({ body: { title: 'x', locations: [{ projectId: 'p' }] } }),
+        req({
+          body: { title: 'x', locations: [{ projectId: 'p' }] },
+        }),
       ],
       index,
     )
