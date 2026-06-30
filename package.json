@@ -47,6 +47,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
+    "typecheck:scripts": "tsc -p tsconfig.scripts.json --noEmit",
     "test": "vitest run",
     "release:dry": "semantic-release --dry-run --no-ci",
     "prepublishOnly": "pnpm run build"
