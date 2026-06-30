@@ -101,11 +101,11 @@ describe('weeek_update_task tool', () => {
     expect(putFn).toHaveBeenCalledTimes(1)
     const [path, body] = putFn.mock.calls[0]!
     expect(path).toBe('/tm/tasks/t1')
-    // WEEEK uses userId (not assigneeId) and dateEnd (not dueDate)
+    // WEEEK uses userId (not assigneeId) and dueDate (not dateEnd) on the write path
     expect(body).toEqual({
       title: 'Updated',
       userId: 'u5',
-      dateEnd: '2026-12-31',
+      dueDate: '2026-12-31',
     })
     expect(
       (body as Record<string, unknown>).description,

@@ -66,7 +66,7 @@ const inputSchema = {
   date_end: z
     .string()
     .describe(
-      "New due date in ISO 8601. Optional. Omit to leave unchanged. WEEEK's task model uses dateEnd, not dueDate.",
+      "New due date in ISO 8601. Optional. Omit to leave unchanged.",
     )
     .optional(),
 }
@@ -100,7 +100,7 @@ export function registerUpdateTask(
         if (args.priority !== undefined) body.priority = args.priority
         if (args.assignee_id !== undefined)
           body.userId = args.assignee_id
-        if (args.date_end !== undefined) body.dateEnd = args.date_end
+        if (args.date_end !== undefined) body.dueDate = args.date_end
 
         if (Object.keys(body).length === 0) {
           return toMcpError(

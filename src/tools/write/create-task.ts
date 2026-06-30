@@ -77,7 +77,7 @@ const inputSchema = {
   date_end: z
     .string()
     .describe(
-      "Due date in ISO 8601 format (e.g. 2026-04-15 or 2026-04-15T12:00:00Z). Optional. WEEEK's task model uses dateEnd, not dueDate.",
+      "Due date in ISO 8601 format (e.g. 2026-04-15 or 2026-04-15T12:00:00Z). Optional.",
     )
     .optional(),
 }
@@ -109,6 +109,7 @@ export function registerCreateTask(
         // WEEEK create REQUIRES a `locations` array; the task's project and
         // board column live INSIDE each location entry (POST /tm/tasks). The
         // board is implied by the column, so there is no top-level boardId.
+        // Due date is sent as `dueDate` (not `dateEnd`) on the write path.
         const location: Record<string, unknown> = {
           projectId: args.project_id,
         }
@@ -124,7 +125,7 @@ export function registerCreateTask(
         if (args.priority !== undefined) body.priority = args.priority
         if (args.assignee_id !== undefined)
           body.userId = args.assignee_id
-        if (args.date_end !== undefined) body.dateEnd = args.date_end
+        if (args.date_end !== undefined) body.dueDate = args.date_end
 
         const raw = await client.post<unknown>('/tm/tasks', body)
         const task = unwrapTask(raw)

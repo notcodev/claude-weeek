@@ -108,14 +108,14 @@ describe('weeek_create_task tool', () => {
     const [path, body] = postFn.mock.calls[0]!
     expect(path).toBe('/tm/tasks')
     // WEEEK create REQUIRES a locations[] array; project + column live INSIDE
-    // each location (POST /tm/tasks docs). userId (not assigneeId), dateEnd.
+    // each location (POST /tm/tasks docs). userId (not assigneeId), dueDate (not dateEnd).
     expect(body).toEqual({
       locations: [{ projectId: 'p1', boardColumnId: 'col1' }],
       title: 'Ship it',
       description: 'body text',
       priority: 3,
       userId: 'u1',
-      dateEnd: '2026-05-01',
+      dueDate: '2026-05-01',
     })
     // board_id is NOT a WEEEK create field — the column determines the board.
     expect('boardId' in (body as Record<string, unknown>)).toBe(false)
@@ -142,7 +142,7 @@ describe('weeek_create_task tool', () => {
       title: 'minimal',
     })
     expect('description' in body).toBe(false)
-    expect('dateEnd' in body).toBe(false)
+    expect('dueDate' in body).toBe(false)
     expect('userId' in body).toBe(false)
     // no boardColumnId inside the location when none provided
     expect(

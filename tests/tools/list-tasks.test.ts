@@ -178,10 +178,10 @@ describe('weeek_list_tasks tool', () => {
     expect(query.projectId).toBe('p1')
     expect(query.boardId).toBe('b1')
     expect(query.boardColumnId).toBe('c1')
-    // WEEEK uses userId as the assignee filter param, not assigneeId
+    // WEEEK uses userId as the assignee filter param (not assigneeId); completed as integer 1/0 (not isCompleted); perPage (not limit)
     expect(query.userId).toBe('u1')
-    expect(query.isCompleted).toBe(false)
-    expect(query.limit).toBe(10)
+    expect(query.completed).toBe(0)
+    expect(query.perPage).toBe(10)
     expect(query.offset).toBe(20)
   })
 

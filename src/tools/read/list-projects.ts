@@ -70,7 +70,7 @@ export function registerListProjects(
       try {
         const client = resolveClient(registry, args.workspace)
         const raw = await client.get<unknown>('/tm/projects', {
-          limit: args.limit,
+          perPage: args.limit,
           offset: args.offset,
         })
         const projects = extractArray<RawWeeekProject>(

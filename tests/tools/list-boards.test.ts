@@ -150,7 +150,7 @@ describe('weeek_list_boards tool', () => {
       offset: 5,
     })
     const query = getFn.mock.calls[0]![1] as Record<string, unknown>
-    expect(query.limit).toBe(10)
+    expect(query.perPage).toBe(10)
     expect(query.offset).toBe(5)
   })
 
