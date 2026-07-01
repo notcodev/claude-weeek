@@ -2,7 +2,7 @@ import { eslint } from '@notcodev/eslint'
 
 export default eslint({
   typescript: true,
-  ignores: ['dist/**', 'coverage/**', '**/*.md'],
+  ignores: ['dist/**', 'coverage/**', '**/*.md', 'spec/**'],
 }).append({
   name: 'claude-weeek/stdio-safety',
   rules: {

@@ -141,7 +141,7 @@ describe('weeek_list_board_columns tool', () => {
 
     await fake.getHandler()({ board_id: 'b1', limit: 3, offset: 9 })
     const query = getFn.mock.calls[0]![1] as Record<string, unknown>
-    expect(query.limit).toBe(3)
+    expect(query.perPage).toBe(3)
     expect(query.offset).toBe(9)
   })
 

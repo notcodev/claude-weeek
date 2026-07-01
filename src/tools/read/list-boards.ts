@@ -79,7 +79,7 @@ export function registerListBoards(
         const client = resolveClient(registry, args.workspace)
         const raw = await client.get<unknown>('/tm/boards', {
           projectId: args.project_id,
-          limit: args.limit,
+          perPage: args.limit,
           offset: args.offset,
         })
         const boards = extractArray<RawBoard>(raw, 'boards').map(

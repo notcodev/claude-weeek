@@ -73,7 +73,7 @@ export function registerListWorkspaceMembers(
       try {
         const client = resolveClient(registry, args.workspace)
         const raw = await client.get<unknown>('/ws/members', {
-          limit: args.limit,
+          perPage: args.limit,
           offset: args.offset,
         })
         const members = extractArray<RawMember>(raw, 'members').map(

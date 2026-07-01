@@ -134,7 +134,7 @@ describe('weeek_list_projects tool', () => {
     registerListProjects(fake.server, fakeRegistry(client))
     await fake.getHandler()({ limit: 5, offset: 10 })
     expect(getFn).toHaveBeenCalledWith('/tm/projects', {
-      limit: 5,
+      perPage: 5,
       offset: 10,
     })
   })

@@ -178,11 +178,31 @@ describe('weeek_list_tasks tool', () => {
     expect(query.projectId).toBe('p1')
     expect(query.boardId).toBe('b1')
     expect(query.boardColumnId).toBe('c1')
-    // WEEEK uses userId as the assignee filter param, not assigneeId
+    // WEEEK uses userId as the assignee filter param (not assigneeId); completed as integer 1/0 (not isCompleted); perPage (not limit)
     expect(query.userId).toBe('u1')
-    expect(query.isCompleted).toBe(false)
-    expect(query.limit).toBe(10)
+    expect(query.completed).toBe(0)
+    expect(query.perPage).toBe(10)
     expect(query.offset).toBe(20)
+  })
+
+  it('converts is_completed: true to completed: 1 in query', async () => {
+    const getFn = vi.fn(async () => ({ tasks: [] }))
+    const client = {
+      get: getFn,
+      post: vi.fn(),
+      put: vi.fn(),
+      patch: vi.fn(),
+    }
+    registerListTasks(fake.server, fakeRegistry(client))
+
+    await fake.getHandler()({
+      is_completed: true,
+      limit: 10,
+    })
+
+    const query = getFn.mock.calls[0]![1] as Record<string, unknown>
+    expect(query.completed).toBe(1)
+    expect(query.perPage).toBe(10)
   })
 
   it('returns isError:true on WeeekApiError, does not throw', async () => {

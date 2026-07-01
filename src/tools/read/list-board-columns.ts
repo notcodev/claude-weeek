@@ -79,7 +79,7 @@ export function registerListBoardColumns(
         const client = resolveClient(registry, args.workspace)
         const raw = await client.get<unknown>('/tm/board-columns', {
           boardId: args.board_id,
-          limit: args.limit,
+          perPage: args.limit,
           offset: args.offset,
         })
         const columns = extractArray<RawColumn>(
