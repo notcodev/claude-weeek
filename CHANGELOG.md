@@ -1,3 +1,23 @@
+# [1.2.0](https://github.com/notcodev/claude-weeek/compare/v1.1.1...v1.2.0) (2026-07-01)
+
+
+### Bug Fixes
+
+* **tools:** use WEEEK wire names perPage/completed/dueDate (drift fix) ([c742c58](https://github.com/notcodev/claude-weeek/commit/c742c58c3b42c29035fb5caf6209732f0169bf26))
+
+
+### Features
+
+* **spec-sync:** allowlist for verified WEEEK spec gaps; spec:check green ([9c88655](https://github.com/notcodev/claude-weeek/commit/9c88655a5e151fb5b44460bcc8d1255e4fc537e7))
+* **spec-sync:** check-drift CLI comparing tools to the snapshot ([242b763](https://github.com/notcodev/claude-weeek/commit/242b763ba3330e62220a1d4b1c9d5ce30a22d594))
+* **spec-sync:** drift report formatting and error gate ([9998d24](https://github.com/notcodev/claude-weeek/commit/9998d24980f1be411025fb1163e5873015067da5))
+* **spec-sync:** fetch-spec CLI and committed OpenAPI snapshot ([89236cc](https://github.com/notcodev/claude-weeek/commit/89236cc5b108b9db7d24d4a8b65f785a10073afb))
+* **spec-sync:** fixtures and runtime contract-capture harness ([37490fb](https://github.com/notcodev/claude-weeek/commit/37490fb5c4791013a8c0a381b77f1ccfd30ae1b9))
+* **spec-sync:** OpenAPI operation index and path matcher ([cfde08d](https://github.com/notcodev/claude-weeek/commit/cfde08d7f86261309c03ac7f79819aad5bb086f4))
+* **spec-sync:** portal discovery and live OpenAPI chunk loader ([a4c588a](https://github.com/notcodev/claude-weeek/commit/a4c588a66efa1bfb2d17e0ecd87893db341b7132))
+* **spec-sync:** recording client for runtime request capture ([a746458](https://github.com/notcodev/claude-weeek/commit/a7464589338594ff32288b4317cd34cfdd29ae62))
+* **spec-sync:** request-vs-spec comparison rules ([63b36f7](https://github.com/notcodev/claude-weeek/commit/63b36f7ef33ecf1e954471411cda92da0aae656a))
+
 ## [1.1.1](https://github.com/notcodev/claude-weeek/compare/v1.1.0...v1.1.1) (2026-06-30)
 
 
