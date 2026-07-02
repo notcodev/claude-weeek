@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/notcodev/claude-weeek/compare/v1.2.0...v1.2.1) (2026-07-02)
+
+
+### Bug Fixes
+
+* **setup:** note MCP config step is already done for plugin installs ([28f36e1](https://github.com/notcodev/claude-weeek/commit/28f36e1b0e372b65b33ab74930857113e9bd0cfa))
+
 # [1.2.0](https://github.com/notcodev/claude-weeek/compare/v1.1.1...v1.2.0) (2026-07-01)
 
 
