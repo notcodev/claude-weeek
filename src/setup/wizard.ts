@@ -95,7 +95,13 @@ export async function runSetup(): Promise<void> {
       ? configPath
       : undefined
     console.log(`\nWrote ${configPath} (mode 0600).`)
-    console.log('\nAdd this to your MCP client config:\n')
+    console.log(
+      '\nInstalled the WEEEK plugin in Claude Code? ' +
+        "You're done — the server is already registered.",
+    )
+    console.log(
+      '\nSetting up MCP manually? Add this to your client config:\n',
+    )
     console.log(generateMcpBlock({ configPath: custom }))
   } finally {
     rl.close()
