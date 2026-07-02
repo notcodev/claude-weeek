@@ -1,3 +1,10 @@
+## [1.2.2](https://github.com/notcodev/claude-weeek/compare/v1.2.1...v1.2.2) (2026-07-02)
+
+
+### Bug Fixes
+
+* **tools:** shape task responses to strip workspace-schema bloat ([0f88d67](https://github.com/notcodev/claude-weeek/commit/0f88d676be1373922f067eb98a745eb02e535ca5))
+
 ## [1.2.1](https://github.com/notcodev/claude-weeek/compare/v1.2.0...v1.2.1) (2026-07-02)
 
 
