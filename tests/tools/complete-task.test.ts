@@ -126,6 +126,37 @@ describe('weeek_complete_task tool', () => {
     expect(putFn).not.toHaveBeenCalled()
   })
 
+  it('shapes the re-fetched task and strips workspace-schema bloat', async () => {
+    const client = {
+      get: vi.fn(async () => ({
+        task: {
+          id: 't1',
+          title: 'Done',
+          isCompleted: true,
+          // WEEEK echoes the whole workspace custom-field schema (~80k tokens)
+          customFields: [
+            { id: 'cf1', options: [{ id: 'o1', name: 'x' }] },
+          ],
+          subscribers: ['u1', 'u2'],
+        },
+      })),
+      post: vi.fn(async () => ({ success: true })),
+      put: vi.fn(),
+      patch: vi.fn(),
+    }
+    registerCompleteTask(fake.server, fakeRegistry(client))
+
+    const res = await fake.getHandler()({ task_id: 't1' })
+    const payload = JSON.parse(res.content[0]!.text) as Record<
+      string,
+      unknown
+    >
+    expect(payload.id).toBe('t1')
+    expect(payload.isCompleted).toBe(true)
+    expect('customFields' in payload).toBe(false)
+    expect('subscribers' in payload).toBe(false)
+  })
+
   it('returns isError:true on WeeekApiError, does not throw', async () => {
     const client = {
       get: vi.fn(),

@@ -15,7 +15,11 @@ import {
   resolveClient,
   workspaceParamSchema,
 } from '../workspace-param.js'
-import { jsonContent } from './_helpers.js'
+import {
+  jsonContent,
+  shapeTaskDetail,
+  unwrapTask,
+} from './_helpers.js'
 
 const inputSchema = {
   task_id: z
@@ -44,15 +48,7 @@ export function registerGetTask(
         const raw = await client.get<unknown>(
           `/tm/tasks/${encodeURIComponent(args.task_id)}`,
         )
-        let task: unknown = raw
-        if (
-          raw &&
-          typeof raw === 'object' &&
-          'task' in (raw as object)
-        ) {
-          task = (raw as Record<string, unknown>).task
-        }
-        return jsonContent(task)
+        return jsonContent(shapeTaskDetail(unwrapTask(raw)))
       } catch (err) {
         return toMcpError(err)
       }

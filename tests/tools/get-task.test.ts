@@ -75,7 +75,7 @@ describe('weeek_get_task tool', () => {
     expect(desc).toMatch(/weeek_list_tasks/)
   })
 
-  it('gETs /tm/tasks/{id} and unwraps the task envelope', async () => {
+  it('gETs /tm/tasks/{id}, unwraps the envelope, and strips workspace-schema bloat', async () => {
     const getFn = vi.fn(async (path: string) => {
       expect(path).toBe('/tm/tasks/task-99')
       return {
@@ -84,6 +84,12 @@ describe('weeek_get_task tool', () => {
           title: 'Ship it',
           description: 'body',
           priority: 3,
+          // WEEEK returns the whole workspace custom-field schema (~80k tokens)
+          customFields: [
+            { id: 'cf1', options: [{ id: 'o1', name: 'x' }] },
+          ],
+          subscribers: ['u1', 'u2'],
+          subTasks: [{ id: 'st1' }],
         },
       }
     })
@@ -103,6 +109,13 @@ describe('weeek_get_task tool', () => {
     >
     expect(payload.id).toBe('task-99')
     expect(payload.title).toBe('Ship it')
+    // description is kept (detailed shape), priority is normalised to string
+    expect(payload.description).toBe('body')
+    expect(payload.priority).toBe('3')
+    // the bloat must never reach the response
+    expect('customFields' in payload).toBe(false)
+    expect('subscribers' in payload).toBe(false)
+    expect('subTasks' in payload).toBe(false)
     expect('comments' in payload).toBe(false)
   })
 

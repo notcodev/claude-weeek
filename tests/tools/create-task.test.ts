@@ -151,11 +151,20 @@ describe('weeek_create_task tool', () => {
     ).not.toHaveProperty('boardColumnId')
   })
 
-  it('unwraps the {task: ...} envelope in the response', async () => {
+  it('unwraps the {task: ...} envelope and strips workspace-schema bloat', async () => {
     const client = {
       get: vi.fn(),
       post: vi.fn(async () => ({
-        task: { id: 't1', title: 'hello' },
+        task: {
+          id: 't1',
+          title: 'hello',
+          description: 'body',
+          // WEEEK echoes the whole workspace custom-field schema (~80k tokens)
+          customFields: [
+            { id: 'cf1', options: [{ id: 'o1', name: 'x' }] },
+          ],
+          subscribers: ['u1', 'u2'],
+        },
       })),
       put: vi.fn(),
       patch: vi.fn(),
@@ -167,11 +176,16 @@ describe('weeek_create_task tool', () => {
       project_id: 'p1',
     })
     expect(res.isError).toBeUndefined()
-    const payload = JSON.parse(res.content[0]!.text) as {
-      id: string
-      title: string
-    }
-    expect(payload).toEqual({ id: 't1', title: 'hello' })
+    const payload = JSON.parse(res.content[0]!.text) as Record<
+      string,
+      unknown
+    >
+    expect(payload.id).toBe('t1')
+    expect(payload.title).toBe('hello')
+    expect(payload.description).toBe('body')
+    // the bloat must never reach the response
+    expect('customFields' in payload).toBe(false)
+    expect('subscribers' in payload).toBe(false)
   })
 
   it('handles raw (non-enveloped) response', async () => {
