@@ -11,6 +11,7 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { z } from 'zod'
 
 import type { WorkspaceRegistry } from '../../workspace-registry.js'
+import type { RawTask } from './_helpers.js'
 
 import { toMcpError } from '../../errors.js'
 import { logger } from '../../logger.js'
@@ -22,81 +23,8 @@ import {
   extractArray,
   jsonContent,
   listParamsSchema,
+  shapeTask,
 } from './_helpers.js'
-
-interface RawTask {
-  assignees?: Array<string>
-  authorId?: string | null
-  boardColumnId?: number | string
-  boardId?: number | string
-  date?: string | null
-  dateEnd?: string | null
-  dateStart?: string | null
-  id?: number | string
-  isCompleted?: boolean
-  isDeleted?: boolean
-  parentId?: number | string | null
-  priority?: number | string
-  projectId?: number | string
-  tags?: Array<number | string>
-  title?: string
-  type?: string
-  updatedAt?: string | null
-  userId?: string | null
-  [k: string]: unknown
-}
-
-interface ShapedTask {
-  /** Primary assignee (WEEEK's userId field). */
-  assigneeId: string | null
-  /** All assignees (WEEEK's assignees array — tasks can have multiple). */
-  assigneeIds: string[]
-  authorId: string | null
-  boardColumnId: string | null
-  boardId: string | null
-  dateEnd: string | null
-  dateStart: string | null
-  id: string
-  isCompleted: boolean
-  parentId: string | null
-  priority: string | null
-  projectId: string | null
-  tags: string[]
-  title: string
-  type: string | null
-  updatedAt: string | null
-}
-
-function shapeTask(raw: RawTask): ShapedTask {
-  const assigneeIds = Array.isArray(raw.assignees)
-    ? raw.assignees.map((u) => String(u))
-    : []
-  const primaryAssignee =
-    (raw.userId ?? null) != null
-      ? String(raw.userId)
-      : (assigneeIds[0] ?? null)
-  return {
-    id: String(raw.id ?? ''),
-    title: String(raw.title ?? ''),
-    type: raw.type ?? null,
-    parentId: raw.parentId == null ? null : String(raw.parentId),
-    projectId: raw.projectId == null ? null : String(raw.projectId),
-    boardId: raw.boardId == null ? null : String(raw.boardId),
-    boardColumnId:
-      raw.boardColumnId == null ? null : String(raw.boardColumnId),
-    assigneeId: primaryAssignee,
-    assigneeIds,
-    authorId: raw.authorId == null ? null : String(raw.authorId),
-    isCompleted: Boolean(raw.isCompleted),
-    priority: raw.priority == null ? null : String(raw.priority),
-    dateStart: raw.dateStart ?? null,
-    dateEnd: raw.dateEnd ?? null,
-    tags: Array.isArray(raw.tags)
-      ? raw.tags.map((t) => String(t))
-      : [],
-    updatedAt: raw.updatedAt ?? null,
-  }
-}
 
 const inputSchema = {
   project_id: z

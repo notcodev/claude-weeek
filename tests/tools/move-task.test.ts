@@ -131,6 +131,40 @@ describe('weeek_move_task tool', () => {
     })
   })
 
+  it('shapes the re-fetched task and strips workspace-schema bloat', async () => {
+    const client = {
+      get: vi.fn(async () => ({
+        task: {
+          id: 't1',
+          title: 'Moved',
+          boardColumnId: 'col-2',
+          // WEEEK echoes the whole workspace custom-field schema (~80k tokens)
+          customFields: [
+            { id: 'cf1', options: [{ id: 'o1', name: 'x' }] },
+          ],
+          subscribers: ['u1', 'u2'],
+        },
+      })),
+      post: vi.fn(async () => ({ success: true })),
+      put: vi.fn(),
+      patch: vi.fn(),
+    }
+    registerMoveTask(fake.server, fakeRegistry(client))
+
+    const res = await fake.getHandler()({
+      task_id: 't1',
+      board_column_id: 'col-2',
+    })
+    const payload = JSON.parse(res.content[0]!.text) as Record<
+      string,
+      unknown
+    >
+    expect(payload.id).toBe('t1')
+    expect(payload.boardColumnId).toBe('col-2')
+    expect('customFields' in payload).toBe(false)
+    expect('subscribers' in payload).toBe(false)
+  })
+
   it('returns isError:true on WeeekApiError, does not throw', async () => {
     const client = {
       get: vi.fn(),

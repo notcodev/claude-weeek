@@ -113,6 +113,41 @@ describe('weeek_update_task tool', () => {
     expect((body as Record<string, unknown>).priority).toBeUndefined()
   })
 
+  it('shapes the updated task and strips workspace-schema bloat', async () => {
+    const client = {
+      get: vi.fn(),
+      post: vi.fn(),
+      put: vi.fn(async () => ({
+        task: {
+          id: 't1',
+          title: 'Updated',
+          description: 'body',
+          // WEEEK echoes the whole workspace custom-field schema (~80k tokens)
+          customFields: [
+            { id: 'cf1', options: [{ id: 'o1', name: 'x' }] },
+          ],
+          subscribers: ['u1', 'u2'],
+        },
+      })),
+      patch: vi.fn(),
+    }
+    registerUpdateTask(fake.server, fakeRegistry(client))
+
+    const res = await fake.getHandler()({
+      task_id: 't1',
+      title: 'Updated',
+    })
+    const payload = JSON.parse(res.content[0]!.text) as Record<
+      string,
+      unknown
+    >
+    expect(payload.id).toBe('t1')
+    expect(payload.title).toBe('Updated')
+    expect(payload.description).toBe('body')
+    expect('customFields' in payload).toBe(false)
+    expect('subscribers' in payload).toBe(false)
+  })
+
   it('returns isError when no editable fields are provided', async () => {
     const putFn = vi.fn()
     const client = {

@@ -16,18 +16,15 @@ import type { WorkspaceRegistry } from '../../workspace-registry.js'
 
 import { toMcpError } from '../../errors.js'
 import { logger } from '../../logger.js'
-import { jsonContent } from '../read/_helpers.js'
+import {
+  jsonContent,
+  shapeTaskDetail,
+  unwrapTask,
+} from '../read/_helpers.js'
 import {
   resolveClient,
   workspaceParamSchema,
 } from '../workspace-param.js'
-
-function unwrapTask(raw: unknown): unknown {
-  if (raw && typeof raw === 'object' && 'task' in (raw as object)) {
-    return (raw as Record<string, unknown>).task
-  }
-  return raw
-}
 
 const inputSchema = {
   ...workspaceParamSchema,
@@ -89,8 +86,7 @@ export function registerMoveTask(
         // The move endpoints return only { success: true }; re-fetch the task
         // so the caller gets the updated task object (matches the tool's docs).
         const raw = await client.get<unknown>(taskPath)
-        const task = unwrapTask(raw)
-        return jsonContent(task)
+        return jsonContent(shapeTaskDetail(unwrapTask(raw)))
       } catch (err) {
         return toMcpError(err)
       }
