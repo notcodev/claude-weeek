@@ -22,6 +22,7 @@ import {
   resolveClient,
   workspaceParamSchema,
 } from '../workspace-param.js'
+import { DESCRIPTION_HTML_GUIDANCE } from './_shared.js'
 
 const inputSchema = {
   ...workspaceParamSchema,
@@ -39,9 +40,7 @@ const inputSchema = {
     ),
   description: z
     .string()
-    .describe(
-      'Task description / body. Optional. Plain text; WEEEK may render basic formatting.',
-    )
+    .describe(DESCRIPTION_HTML_GUIDANCE)
     .optional(),
   board_id: z
     .string()
@@ -87,7 +86,7 @@ export function registerCreateTask(
     'weeek_create_task',
     {
       description:
-        "Create a NEW task in WEEEK. WRITE OPERATION — the MCP client may prompt for user confirmation before this runs. Required: title and project_id. Optional: description, board_id, board_column_id (status), priority, assignee_id, due_date. Returns the created task object in the same shape as weeek_get_task. Use this ONLY when creating a brand-new task; to change an existing task's fields use weeek_update_task, to move it to a different column use weeek_move_task, to mark it done use weeek_complete_task. All *_id parameters must come from the corresponding list tools — do not guess IDs.",
+        "Create a NEW task in WEEEK. WRITE OPERATION — the MCP client may prompt for user confirmation before this runs. Required: title and project_id. Optional: description, board_id, board_column_id (status), priority, assignee_id, due_date. Returns the created task object in the same shape as weeek_get_task. Use this ONLY when creating a brand-new task; to change an existing task's fields use weeek_update_task, to move it to a different column use weeek_move_task, to mark it done use weeek_complete_task. All *_id parameters must come from the corresponding list tools — do not guess IDs. The description parameter accepts a small WEEEK HTML subset (paragraphs, bold, italic, links, lists) for rich formatting — see its parameter guidance for the exact allowed tags.",
       inputSchema,
     },
     async (args: {
