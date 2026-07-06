@@ -26,6 +26,7 @@ import {
   resolveClient,
   workspaceParamSchema,
 } from '../workspace-param.js'
+import { DESCRIPTION_HTML_GUIDANCE_UPDATE } from './_shared.js'
 
 const inputSchema = {
   ...workspaceParamSchema,
@@ -42,9 +43,7 @@ const inputSchema = {
     .optional(),
   description: z
     .string()
-    .describe(
-      'New task description. Optional. Omit to leave unchanged. Pass empty string to clear.',
-    )
+    .describe(DESCRIPTION_HTML_GUIDANCE_UPDATE)
     .optional(),
   priority: z
     .number()
@@ -76,7 +75,7 @@ export function registerUpdateTask(
     'weeek_update_task',
     {
       description:
-        'Update editable fields of an EXISTING task in WEEEK. WRITE OPERATION — the MCP client may prompt for confirmation. Required: task_id. Optional: title, description, priority, assignee_id, due_date — only provided fields are sent, omitted fields remain unchanged. Returns the updated task. Do NOT use this to move tasks between columns (use weeek_move_task) or to mark tasks complete (use weeek_complete_task) — those are separate operations in WEEEK. The task_id must come from weeek_list_tasks.',
+        'Update editable fields of an EXISTING task in WEEEK. WRITE OPERATION — the MCP client may prompt for confirmation. Required: task_id. Optional: title, description, priority, assignee_id, due_date — only provided fields are sent, omitted fields remain unchanged. Returns the updated task. Do NOT use this to move tasks between columns (use weeek_move_task) or to mark tasks complete (use weeek_complete_task) — those are separate operations in WEEEK. The task_id must come from weeek_list_tasks. The description parameter accepts a small WEEEK HTML subset (paragraphs, bold, italic, links, lists) for rich formatting — see its parameter guidance for the exact allowed tags.',
       inputSchema,
     },
     async (args: {
