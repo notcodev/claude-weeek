@@ -1,3 +1,11 @@
+# [1.3.0](https://github.com/notcodev/claude-weeek/compare/v1.2.2...v1.3.0) (2026-07-06)
+
+
+### Features
+
+* **create-task:** advertise WEEEK HTML subset in description guidance ([ed02b15](https://github.com/notcodev/claude-weeek/commit/ed02b15135ab6b5b05faf6e4ab19f6aa0b31d197))
+* **update-task:** advertise WEEEK HTML subset in description guidance ([cb4017d](https://github.com/notcodev/claude-weeek/commit/cb4017de76b8cfc49e588baaadf82816a031a6df))
+
 ## [1.2.2](https://github.com/notcodev/claude-weeek/compare/v1.2.1...v1.2.2) (2026-07-02)
 
 

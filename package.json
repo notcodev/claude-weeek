@@ -1,7 +1,7 @@
 {
   "name": "claude-weeek",
   "type": "module",
-  "version": "1.2.2",
+  "version": "1.3.0",
   "packageManager": "pnpm@10.27.0",
   "description": "WEEEK task tracker integration for Claude Code — read/write tools for AI coding agents",
   "author": "Erik Codev <hello@notco.dev>",
