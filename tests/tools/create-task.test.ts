@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { WeeekApiError } from '../../src/errors.js'
+import { DESCRIPTION_HTML_GUIDANCE } from '../../src/tools/write/_shared.js'
 import { registerCreateTask } from '../../src/tools/write/create-task.js'
 import { fakeRegistry } from './_registry.js'
 
@@ -23,16 +24,22 @@ type Handler = (args: CreateArgs) => Promise<{
 function makeFakeServer() {
   let capturedName = ''
   let capturedDescription = ''
+  let capturedInputSchema: Record<string, { description?: string }> =
+    {}
   let capturedHandler: Handler | null = null
   const server = {
     registerTool: vi.fn(
       (
         name: string,
-        meta: { description: string },
+        meta: {
+          description: string
+          inputSchema: Record<string, { description?: string }>
+        },
         handler: Handler,
       ) => {
         capturedName = name
         capturedDescription = meta.description
+        capturedInputSchema = meta.inputSchema
         capturedHandler = handler
       },
     ),
@@ -43,6 +50,7 @@ function makeFakeServer() {
     >[0],
     name: () => capturedName,
     description: () => capturedDescription,
+    inputSchema: () => capturedInputSchema,
     handler: () => {
       if (!capturedHandler) throw new Error('no handler captured')
       return capturedHandler
@@ -81,6 +89,43 @@ describe('weeek_create_task tool', () => {
     const desc = fake.description()
     expect(desc).toMatch(/create/i)
     expect(desc).toMatch(/weeek_update_task/)
+  })
+
+  it('description field advertises the WEEEK HTML subset', () => {
+    const client = {
+      get: vi.fn(),
+      post: vi.fn(),
+      put: vi.fn(),
+      patch: vi.fn(),
+    }
+    registerCreateTask(fake.server, fakeRegistry(client))
+    const guide = fake.inputSchema().description?.description ?? ''
+    // wired to the shared constant...
+    expect(guide).toBe(DESCRIPTION_HTML_GUIDANCE)
+    // ...and the constant carries the whole whitelist + escaping + fallback note
+    for (const marker of [
+      '<p>',
+      '<strong>',
+      '<em>',
+      '<a href',
+      '<br>',
+      '<li>',
+      '&lt;',
+      'Plain text is still accepted',
+    ]) {
+      expect(guide).toContain(marker)
+    }
+  })
+
+  it('tool description mentions HTML formatting', () => {
+    const client = {
+      get: vi.fn(),
+      post: vi.fn(),
+      put: vi.fn(),
+      patch: vi.fn(),
+    }
+    registerCreateTask(fake.server, fakeRegistry(client))
+    expect(fake.description()).toMatch(/HTML/)
   })
 
   it('pOSTs to /tm/tasks with a locations[] array (WEEEK spec)', async () => {

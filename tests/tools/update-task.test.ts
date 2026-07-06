@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { WeeekApiError } from '../../src/errors.js'
+import { DESCRIPTION_HTML_GUIDANCE_UPDATE } from '../../src/tools/write/_shared.js'
 import { registerUpdateTask } from '../../src/tools/write/update-task.js'
 import { fakeRegistry } from './_registry.js'
 
@@ -21,16 +22,22 @@ type Handler = (args: UpdateArgs) => Promise<{
 function makeFakeServer() {
   let capturedName = ''
   let capturedDescription = ''
+  let capturedInputSchema: Record<string, { description?: string }> =
+    {}
   let capturedHandler: Handler | null = null
   const server = {
     registerTool: vi.fn(
       (
         name: string,
-        meta: { description: string },
+        meta: {
+          description: string
+          inputSchema: Record<string, { description?: string }>
+        },
         handler: Handler,
       ) => {
         capturedName = name
         capturedDescription = meta.description
+        capturedInputSchema = meta.inputSchema
         capturedHandler = handler
       },
     ),
@@ -41,6 +48,8 @@ function makeFakeServer() {
     >[0],
     getName: () => capturedName,
     getDescription: () => capturedDescription,
+    description: () => capturedDescription,
+    inputSchema: () => capturedInputSchema,
     getHandler: () => {
       if (!capturedHandler) throw new Error('no handler captured')
       return capturedHandler
@@ -77,6 +86,44 @@ describe('weeek_update_task tool', () => {
     const desc = fake.getDescription()
     expect(desc).toMatch(/weeek_move_task/)
     expect(desc).toMatch(/weeek_complete_task/)
+  })
+
+  it('description field advertises the WEEEK HTML subset', () => {
+    const client = {
+      get: vi.fn(),
+      post: vi.fn(),
+      put: vi.fn(),
+      patch: vi.fn(),
+    }
+    registerUpdateTask(fake.server, fakeRegistry(client))
+    const guide = fake.inputSchema().description?.description ?? ''
+    expect(guide).toBe(DESCRIPTION_HTML_GUIDANCE_UPDATE)
+    for (const marker of [
+      '<p>',
+      '<strong>',
+      '<em>',
+      '<a href',
+      '<br>',
+      '<li>',
+      '&lt;',
+      'Plain text is still accepted',
+      // update-only tail must survive
+      'Omit to leave unchanged',
+      'Pass empty string to clear',
+    ]) {
+      expect(guide).toContain(marker)
+    }
+  })
+
+  it('tool description mentions HTML formatting', () => {
+    const client = {
+      get: vi.fn(),
+      post: vi.fn(),
+      put: vi.fn(),
+      patch: vi.fn(),
+    }
+    registerUpdateTask(fake.server, fakeRegistry(client))
+    expect(fake.description()).toMatch(/HTML/)
   })
 
   it('pUTs to /tm/tasks/{id} with only provided camelCase fields', async () => {
